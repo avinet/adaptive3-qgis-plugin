@@ -2,7 +2,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from dlgUstawieniaBase import Ui_UstawieniaDialog
-from geopanel_data import *
+from adaptive_data import *
 
 #----------------------------------------------------------------------------
 

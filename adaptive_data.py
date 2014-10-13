@@ -16,14 +16,14 @@ def ustawienia(kontekst, domyslnie=None, format=unicode):
       domyslnie = ''
     settings = QSettings()
     if format == int:
-        return settings.value('/GeoPanelAdmin/'+ kontekst, domyslnie, type=int)
+        return settings.value('/AdaptivePlugin/'+ kontekst, domyslnie, type=int)
     elif format == bool:
-        return settings.value('/GeoPanelAdmin/'+ kontekst, domyslnie, type=unicode).upper() in ['TRUE', 'TAK']
+        return settings.value('/AdaptivePlugin/'+ kontekst, domyslnie, type=unicode).upper() in ['TRUE', 'TAK']
     else:
-        return settings.value('/GeoPanelAdmin/'+ kontekst, domyslnie, type=unicode)
+        return settings.value('/AdaptivePlugin/'+ kontekst, domyslnie, type=unicode)
 
 
 
 def ustawUstawienia(kontekst, wartosc):
     settings = QSettings()
-    return settings.setValue('/GeoPanelAdmin/'+ kontekst, wartosc)
+    return settings.setValue('/AdaptivePlugin/'+ kontekst, wartosc)

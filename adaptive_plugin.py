@@ -2,8 +2,8 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-import geopanel_data
-from geopanel_data import *     #db,ustawienia, tabele...
+import adaptive_data
+from adaptive_data import *     #db,ustawienia, tabele...
 from resources_rc import *
 
 from dlgHasloPodaj import PodajHasloDialog
@@ -15,7 +15,7 @@ from publikowanie import host, authenticate, walidujProjekt, uploadProjectFile, 
 
 
 
-class GeoPanelPlugin():
+class AdaptivePlugin():
     # ----------------------------------------- #
     def __init__(self, iface):
         self.iface = iface
@@ -144,7 +144,7 @@ class GeoPanelPlugin():
         ok = False
         pytaj = True
         while not ok and pytaj:
-            if geopanel_data.token:
+            if adaptive_data.token:
                 QApplication.setOverrideCursor(Qt.WaitCursor)
                 ok,resp = listProjectFiles()
                 QApplication.restoreOverrideCursor()
@@ -152,14 +152,14 @@ class GeoPanelPlugin():
                 dlg = PodajHasloDialog(self.iface.mainWindow())
                 dlg.label_3.setText(u"Please provide your Adaptive username and password")
                 dlg.labelError.hide()
-                dlg.lineUser.setText(geopanel_data.token_username)
-                dlg.linePass.setText(geopanel_data.token_password)
-                if geopanel_data.token_username: dlg.linePass.setFocus()
+                dlg.lineUser.setText(adaptive_data.token_username)
+                dlg.linePass.setText(adaptive_data.token_password)
+                if adaptive_data.token_username: dlg.linePass.setFocus()
                 dlg.exec_()
                 if dlg.result():
-                    geopanel_data.token_username = dlg.lineUser.text()
-                    geopanel_data.token_password = dlg.linePass.text()
-                    geopanel_data.token = authenticate(geopanel_data.token_username, geopanel_data.token_password)
+                    adaptive_data.token_username = dlg.lineUser.text()
+                    adaptive_data.token_password = dlg.linePass.text()
+                    adaptive_data.token = authenticate(adaptive_data.token_username, adaptive_data.token_password)
                 else:
                     #zaniechano
                     pytaj = False
@@ -198,7 +198,7 @@ class GeoPanelPlugin():
         ok = False
         pytaj = True
         while not ok and pytaj:
-            if geopanel_data.token:
+            if adaptive_data.token:
                 QApplication.setOverrideCursor(Qt.WaitCursor)
                 (ok,result) = uploadProjectFile(self.iface, filePath, (dialog.rezultat==2))
                 QApplication.restoreOverrideCursor()
@@ -206,14 +206,14 @@ class GeoPanelPlugin():
                 dlg = PodajHasloDialog(self.iface.mainWindow())
                 dlg.label_3.setText(u"Please provide your Adaptive username and password")
                 dlg.labelError.hide()
-                dlg.lineUser.setText(geopanel_data.token_username)
-                dlg.linePass.setText(geopanel_data.token_password)
-                if geopanel_data.token_username: dlg.linePass.setFocus()
+                dlg.lineUser.setText(adaptive_data.token_username)
+                dlg.linePass.setText(adaptive_data.token_password)
+                if adaptive_data.token_username: dlg.linePass.setFocus()
                 dlg.exec_()
                 if dlg.result():
-                    geopanel_data.token_username = dlg.lineUser.text()
-                    geopanel_data.token_password = dlg.linePass.text()
-                    geopanel_data.token = authenticate(geopanel_data.token_username, geopanel_data.token_password)
+                    adaptive_data.token_username = dlg.lineUser.text()
+                    adaptive_data.token_password = dlg.linePass.text()
+                    adaptive_data.token = authenticate(adaptive_data.token_username, adaptive_data.token_password)
                 else:
                     #zaniechano
                     pytaj = False

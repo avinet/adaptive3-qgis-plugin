@@ -4,8 +4,8 @@ from PyQt4.QtGui import *
 
 from qgis.core import *
 
-import geopanel_data
-from geopanel_data import db
+import adaptive_data
+from adaptive_data import db
 
 import json
 import urllib2, cookielib
@@ -68,7 +68,7 @@ def walidujProjekt(iface, filePath):
 
 
 def authenticate(username, password):
-    ''' Uwierzytelnij w serwisie GEOPanel
+    ''' Uwierzytelnij w serwisie Adaptive
         params:
         returns: string token
     '''
@@ -104,7 +104,7 @@ def uploadProjectFile(iface, filePath, publiczny):
                "file" : open(filePath, "rb") }
 
     try:
-        opener.open("http://%s/%s?token=%s" % (host,selector,str(geopanel_data.token)), params)
+        opener.open("http://%s/%s?token=%s" % (host,selector,str(adaptive_data.token)), params)
     except:
         return ( False, u'Error while writing data to Adaptive!' )
     return (True, '%s' % (fileName))
@@ -119,7 +119,7 @@ def listProjectFiles():
     cookies = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandler) #zwraca OpenerDirector
     try:
-        f = opener.open("http://%s/%s?token=%s" % (host,selector,geopanel_data.token))
+        f = opener.open("http://%s/%s?token=%s" % (host,selector,adaptive_data.token))
     except:
         return ( False, None )
     return (True, json.loads(f.read()))
@@ -132,7 +132,7 @@ def deleteProjectFile(fileName):
     '''
 
     opener = urllib2.build_opener(urllib2.HTTPHandler)
-    request = urllib2.Request("http://%s/%s/%s?token=%s" % (host,selector,fileName,geopanel_data.token))
+    request = urllib2.Request("http://%s/%s/%s?token=%s" % (host,selector,fileName,adaptive_data.token))
     request.get_method = lambda: 'DELETE'
 
     try:
@@ -152,7 +152,7 @@ def readProjectFile(fileName):
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandler) #zwraca OpenerDirector
 
     try:
-        f = opener.open("http://%s/%s/%s?token=%s" % (host,selector,fileName,geopanel_data.token))
+        f = opener.open("http://%s/%s/%s?token=%s" % (host,selector,fileName,adaptive_data.token))
     except:
         return ( False, None )
     return (True, f.read())
