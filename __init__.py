@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
 
 def classFactory(iface):
-  from adaptive_plugin import AdaptivePlugin
+  from mainPlugin import AdaptivePlugin
   return AdaptivePlugin(iface)

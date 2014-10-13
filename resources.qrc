@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/plugins/Adaptive">
+    <qresource prefix="/plugins/AdaptiveDesktop">
         <file>about.png</file>
     </qresource>
 </RCC>
