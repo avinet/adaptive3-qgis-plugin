@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/GeoPanel">
+        <file>about.png</file>
+    </qresource>
+</RCC>

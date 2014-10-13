@@ -1,0 +1,15 @@
+[general]
+name=Adaptive Desktop plugin
+qgisMinimumVersion=2.0
+
+description=Tool for easy publishing QGIS Projects to Adaptive
+version=2.1
+
+homepage=http://gridw.pl
+icon=about.png
+experimental=False
+deprecated=False
+
+# Author contact information
+author=Borys Jurgiel dla UNEP/GRID Warszawa
+email=grid@gridw.pl
