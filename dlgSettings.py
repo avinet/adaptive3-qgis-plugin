@@ -7,19 +7,19 @@ from adaptive_data import *
 #----------------------------------------------------------------------------
 
 
-class UstawieniaDialog(QDialog, Ui_UstawieniaDialog):
+class SettingsDialog(QDialog, Ui_SettingsDialog):
     def __init__(self, iface):
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
-        self.wypelnijBazeDanych()
+        self.fillDatabase()
 
 
 
-    def wypelnijBazeDanych(self):
+    def fillDatabase(self):
         settings = QSettings()
         selected = settings.value("/PostgreSQL/connections/selected", type=unicode)
-        selected = ustawienia('bazaDanych', selected)
+        selected = settings('bazaDanych', selected)
         settings.beginGroup("/PostgreSQL/connections")
         keys = settings.childGroups()
         currentIdx = 0
@@ -33,7 +33,7 @@ class UstawieniaDialog(QDialog, Ui_UstawieniaDialog):
 
 
     def close(self):
-        ustawUstawienia('bazaDanych', self.comboUstawBaza.currentText())
+        setSettings('bazaDanych', self.comboUstawBaza.currentText())
         if self.comboUstawBaza.currentText() != self.staraBaza:
             QMessageBox.warning(self.iface.mainWindow(), "Adaptive", u"Database has been changed. Please restart the application.")
         QDialog.close(self)

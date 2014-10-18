@@ -11,19 +11,19 @@ token_password = "" # global variable for authentication data
 
 db = QSqlDatabase.addDatabase("QPSQL")
 
-def ustawienia(kontekst, domyslnie=None, format=unicode):
-    if not domyslnie:
-      domyslnie = ''
+def settings(context, default=None, format=unicode):
+    if not default:
+      default = ''
     settings = QSettings()
     if format == int:
-        return settings.value('/AdaptivePlugin/'+ kontekst, domyslnie, type=int)
+        return settings.value('/AdaptivePlugin/'+ context, default, type=int)
     elif format == bool:
-        return settings.value('/AdaptivePlugin/'+ kontekst, domyslnie, type=unicode).upper() in ['TRUE', 'TAK']
+        return settings.value('/AdaptivePlugin/'+ context, default, type=unicode).upper() in ['TRUE', 'TAK']
     else:
-        return settings.value('/AdaptivePlugin/'+ kontekst, domyslnie, type=unicode)
+        return settings.value('/AdaptivePlugin/'+ context, default, type=unicode)
 
 
 
-def ustawUstawienia(kontekst, wartosc):
+def setSettings(context, value):
     settings = QSettings()
-    return settings.setValue('/AdaptivePlugin/'+ kontekst, wartosc)
+    return settings.setValue('/AdaptivePlugin/'+ context, value)

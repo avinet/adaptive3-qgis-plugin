@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ProjektyDialog</class>
- <widget class="QDialog" name="ProjektyDialog">
+ <class>ProjectsDialog</class>
+ <widget class="QDialog" name="ProjectsDialog">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>
@@ -106,7 +106,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>clicked(QAbstractButton*)</signal>
-   <receiver>ProjektyDialog</receiver>
+   <receiver>ProjectsDialog</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">

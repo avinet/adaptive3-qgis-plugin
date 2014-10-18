@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'dlgPublicznyWewnetrznyBase.ui'
+# Form implementation generated from reading ui file 'dlgPublicPrivateBase.ui'
 #
-# Created: Fri Mar 28 16:42:34 2014
-#      by: PyQt4 UI code generator 4.10.3
+# Created: Sat Oct 18 21:16:27 2014
+#      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -23,15 +23,15 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_PublicznyWewnetrznyDialogBase(object):
-    def setupUi(self, PublicznyWewnetrznyDialogBase):
-        PublicznyWewnetrznyDialogBase.setObjectName(_fromUtf8("PublicznyWewnetrznyDialogBase"))
-        PublicznyWewnetrznyDialogBase.resize(522, 188)
-        self.gridLayout = QtGui.QGridLayout(PublicznyWewnetrznyDialogBase)
+class Ui_PublicPrivateDialogBase(object):
+    def setupUi(self, PublicPrivateDialogBase):
+        PublicPrivateDialogBase.setObjectName(_fromUtf8("PublicPrivateDialogBase"))
+        PublicPrivateDialogBase.resize(522, 188)
+        self.gridLayout = QtGui.QGridLayout(PublicPrivateDialogBase)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         spacerItem = QtGui.QSpacerItem(20, 10, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Fixed)
         self.gridLayout.addItem(spacerItem, 3, 0, 1, 2)
-        self.buttonWewnetrzna = QtGui.QPushButton(PublicznyWewnetrznyDialogBase)
+        self.buttonWewnetrzna = QtGui.QPushButton(PublicPrivateDialogBase)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(145, 0, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -45,7 +45,7 @@ class Ui_PublicznyWewnetrznyDialogBase(object):
         self.buttonWewnetrzna.setPalette(palette)
         self.buttonWewnetrzna.setObjectName(_fromUtf8("buttonWewnetrzna"))
         self.gridLayout.addWidget(self.buttonWewnetrzna, 1, 0, 1, 1)
-        self.buttonPubliczna = QtGui.QPushButton(PublicznyWewnetrznyDialogBase)
+        self.buttonPubliczna = QtGui.QPushButton(PublicPrivateDialogBase)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(0, 128, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -61,23 +61,23 @@ class Ui_PublicznyWewnetrznyDialogBase(object):
         self.gridLayout.addWidget(self.buttonPubliczna, 1, 1, 1, 1)
         spacerItem1 = QtGui.QSpacerItem(458, 15, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem1, 5, 0, 1, 2)
-        self.label_3 = QtGui.QLabel(PublicznyWewnetrznyDialogBase)
+        self.label_3 = QtGui.QLabel(PublicPrivateDialogBase)
         self.label_3.setMinimumSize(QtCore.QSize(0, 30))
         self.label_3.setObjectName(_fromUtf8("label_3"))
         self.gridLayout.addWidget(self.label_3, 0, 0, 1, 2)
-        self.labelInfo = QtGui.QLabel(PublicznyWewnetrznyDialogBase)
+        self.labelInfo = QtGui.QLabel(PublicPrivateDialogBase)
         self.labelInfo.setTextFormat(QtCore.Qt.RichText)
         self.labelInfo.setWordWrap(True)
         self.labelInfo.setObjectName(_fromUtf8("labelInfo"))
         self.gridLayout.addWidget(self.labelInfo, 4, 0, 1, 2)
 
-        self.retranslateUi(PublicznyWewnetrznyDialogBase)
-        QtCore.QMetaObject.connectSlotsByName(PublicznyWewnetrznyDialogBase)
+        self.retranslateUi(PublicPrivateDialogBase)
+        QtCore.QMetaObject.connectSlotsByName(PublicPrivateDialogBase)
 
-    def retranslateUi(self, PublicznyWewnetrznyDialogBase):
-        PublicznyWewnetrznyDialogBase.setWindowTitle(_translate("PublicznyWewnetrznyDialogBase", "Publish WMS", None))
-        self.buttonWewnetrzna.setText(_translate("PublicznyWewnetrznyDialogBase", "Private", None))
-        self.buttonPubliczna.setText(_translate("PublicznyWewnetrznyDialogBase", "Public", None))
-        self.label_3.setText(_translate("PublicznyWewnetrznyDialogBase", "WMS service will be published as:", None))
-        self.labelInfo.setText(_translate("PublicznyWewnetrznyDialogBase", "<html><head/><body><p>If you publish this service as private it won\'t be available to guest Adaptive users.</p></body></html>", None))
+    def retranslateUi(self, PublicPrivateDialogBase):
+        PublicPrivateDialogBase.setWindowTitle(_translate("PublicPrivateDialogBase", "Opublikuj usługę WMS", None))
+        self.buttonWewnetrzna.setText(_translate("PublicPrivateDialogBase", "Wewnętrzna", None))
+        self.buttonPubliczna.setText(_translate("PublicPrivateDialogBase", "Publicznie dostępna", None))
+        self.label_3.setText(_translate("PublicPrivateDialogBase", "Usługa WMS zostanie opublikowana na serwerze GEOPANEL jako:", None))
+        self.labelInfo.setText(_translate("PublicPrivateDialogBase", "<html><head/><body><p>Jeśli opublikujesz tę usługę WMS jako wewnętrzną, będzie ona dostępna wyłącznie w aplikacji GEOPANEL. Publiczna usługa WMS będzie ogólnie dostępna za pomocą dowolnego klienta WMS. W publicznym projekcie aplikacji GEOPANEL prezentowane są wyłącznie warstwy tych usług WMS, które mają status publicznych.</p></body></html>", None))
 

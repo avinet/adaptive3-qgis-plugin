@@ -4,15 +4,15 @@ from PyQt4.QtGui import *
 from PyQt4.QtXml import QDomDocument
 from qgis.core import *
 from dlgProjektyBase import Ui_ProjektyDialog
-from dlgHasloPodaj import PodajHasloDialog
+from dlgEnterPassword import EnterPasswordDialog
 import adaptive_data
 from adaptive_data import *
-from publikowanie import authenticate, listProjectFiles, deleteProjectFile, readProjectFile
+from publishing import authenticate, listProjectFiles, deleteProjectFile, readProjectFile
 
 #----------------------------------------------------------------------------
 
 
-class ProjektyDialog(QDialog, Ui_ProjektyDialog):
+class ProjectsDialog(QDialog, Ui_ProjectsDialog):
     def __init__(self, iface, projekty):
         QDialog.__init__(self)
         self.iface = iface
@@ -20,14 +20,14 @@ class ProjektyDialog(QDialog, Ui_ProjektyDialog):
         self.projekty = projekty
         self.buttonWczytaj.setEnabled(False)
         self.buttonUsun.setEnabled(False)
-        self.buttonUsun.released.connect(self.usunProjekt)
-        self.buttonWczytaj.released.connect(self.wczytajProjekt)
-        self.treeProjekty.itemSelectionChanged.connect(self.zmienionoSelekcje)
-        self.wypelnijDrzewo()
+        self.buttonUsun.released.connect(self.deleteProject)
+        self.buttonWczytaj.released.connect(self.loadProject)
+        self.treeProjekty.itemSelectionChanged.connect(self.selectionChanged)
+        self.fillTree()
 
 
 
-    def wypelnijDrzewo(self):
+    def fillTree(self):
         self.treeProjekty.clear()
         for projekt in self.projekty:
                 item = QTreeWidgetItem(self.treeProjekty)
@@ -48,14 +48,14 @@ class ProjektyDialog(QDialog, Ui_ProjektyDialog):
 
 
 
-    def zmienionoSelekcje(self):
+    def selectionChanged(self):
         cosWybrano = bool(self.treeProjekty.selectedItems())
         self.buttonUsun.setEnabled( cosWybrano )
         self.buttonWczytaj.setEnabled( cosWybrano )
 
 
 
-    def usunProjekt(self):
+    def deleteProject(self):
         if not bool(self.treeProjekty.selectedItems()):
             return
         fileName = self.treeProjekty.selectedItems()[0].text(0)
@@ -70,7 +70,7 @@ class ProjektyDialog(QDialog, Ui_ProjektyDialog):
                     ok,result = deleteProjectFile(unicode(fileName))
                     QApplication.restoreOverrideCursor()
                 if not ok:
-                    dlg = PodajHasloDialog(self.iface.mainWindow())
+                    dlg = EnterPasswordDialog(self.iface.mainWindow())
                     dlg.label_3.setText(u"Please provide your Adaptive username and password")
                     dlg.labelError.hide()
                     dlg.lineUser.setText(adaptive_data.token_username)
@@ -90,11 +90,11 @@ class ProjektyDialog(QDialog, Ui_ProjektyDialog):
             ok,resp = listProjectFiles()
             if ok:
                 self.projekty = resp
-            self.wypelnijDrzewo()
+            self.fillTree()
 
 
 
-    def wczytajProjekt(self):
+    def loadProject(self):
         if not bool(self.treeProjekty.selectedItems()):
             return
         fileName = self.treeProjekty.selectedItems()[0].text(0)
@@ -108,7 +108,7 @@ class ProjektyDialog(QDialog, Ui_ProjektyDialog):
                 ok, xml = readProjectFile(unicode(fileName))
                 QApplication.restoreOverrideCursor()
             if not ok:
-                dlg = PodajHasloDialog(self.iface.mainWindow())
+                dlg = EnterPasswordDialog(self.iface.mainWindow())
                 dlg.label_3.setText(u"Please provide you Adaptive username and password")
                 dlg.labelError.hide()
                 dlg.lineUser.setText(adaptive_data.token_username)

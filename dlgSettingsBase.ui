@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>UstawieniaDialog</class>
- <widget class="QDialog" name="UstawieniaDialog">
+ <class>SettingsDialog</class>
+ <widget class="QDialog" name="SettingsDialog">
   <property name="windowModality">
    <enum>Qt::NonModal</enum>
   </property>
@@ -96,7 +96,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>clicked(QAbstractButton*)</signal>
-   <receiver>UstawieniaDialog</receiver>
+   <receiver>SettingsDialog</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">

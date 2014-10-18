@@ -34,7 +34,7 @@ def connectionStringOk(conn):
     return True
 
 
-def walidujProjekt(iface, filePath):
+def validateProject(iface, filePath):
     ''' Sprawdza, czy projekt nadaje się do wysłania
         params: QgsInterface instancja interfejsu QGIS-a, unicode ścieżka do pliku projektu
         returns: bool wynik (True gdy ok), unicode komunikat błędu

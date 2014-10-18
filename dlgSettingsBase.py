@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'dlgUstawieniaBase.ui'
+# Form implementation generated from reading ui file 'dlgSettingsBase.ui'
 #
-# Created: Tue Jan 14 16:05:44 2014
-#      by: PyQt4 UI code generator 4.10.3
+# Created: Sat Oct 18 21:16:40 2014
+#      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -23,21 +23,21 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_UstawieniaDialog(object):
-    def setupUi(self, UstawieniaDialog):
-        UstawieniaDialog.setObjectName(_fromUtf8("UstawieniaDialog"))
-        UstawieniaDialog.setWindowModality(QtCore.Qt.NonModal)
-        UstawieniaDialog.resize(511, 84)
+class Ui_SettingsDialog(object):
+    def setupUi(self, SettingsDialog):
+        SettingsDialog.setObjectName(_fromUtf8("SettingsDialog"))
+        SettingsDialog.setWindowModality(QtCore.Qt.NonModal)
+        SettingsDialog.resize(511, 84)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(UstawieniaDialog.sizePolicy().hasHeightForWidth())
-        UstawieniaDialog.setSizePolicy(sizePolicy)
-        UstawieniaDialog.setMinimumSize(QtCore.QSize(500, 80))
-        UstawieniaDialog.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
-        self.gridLayout = QtGui.QGridLayout(UstawieniaDialog)
+        sizePolicy.setHeightForWidth(SettingsDialog.sizePolicy().hasHeightForWidth())
+        SettingsDialog.setSizePolicy(sizePolicy)
+        SettingsDialog.setMinimumSize(QtCore.QSize(500, 80))
+        SettingsDialog.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        self.gridLayout = QtGui.QGridLayout(SettingsDialog)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.label_2 = QtGui.QLabel(UstawieniaDialog)
+        self.label_2 = QtGui.QLabel(SettingsDialog)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Maximum, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -45,7 +45,7 @@ class Ui_UstawieniaDialog(object):
         self.label_2.setSizePolicy(sizePolicy)
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.gridLayout.addWidget(self.label_2, 0, 0, 1, 1)
-        self.buttonBox = QtGui.QDialogButtonBox(UstawieniaDialog)
+        self.buttonBox = QtGui.QDialogButtonBox(SettingsDialog)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
@@ -58,18 +58,18 @@ class Ui_UstawieniaDialog(object):
         self.gridLayout.addWidget(self.buttonBox, 2, 0, 1, 3)
         spacerItem = QtGui.QSpacerItem(20, 20, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem, 1, 1, 1, 2)
-        self.comboUstawBaza = QtGui.QComboBox(UstawieniaDialog)
+        self.comboUstawBaza = QtGui.QComboBox(SettingsDialog)
         self.comboUstawBaza.setObjectName(_fromUtf8("comboUstawBaza"))
         self.gridLayout.addWidget(self.comboUstawBaza, 0, 1, 1, 2)
         self.label_2.setBuddy(self.comboUstawBaza)
 
-        self.retranslateUi(UstawieniaDialog)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("clicked(QAbstractButton*)")), UstawieniaDialog.close)
-        QtCore.QMetaObject.connectSlotsByName(UstawieniaDialog)
-        UstawieniaDialog.setTabOrder(self.comboUstawBaza, self.buttonBox)
+        self.retranslateUi(SettingsDialog)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("clicked(QAbstractButton*)")), SettingsDialog.close)
+        QtCore.QMetaObject.connectSlotsByName(SettingsDialog)
+        SettingsDialog.setTabOrder(self.comboUstawBaza, self.buttonBox)
 
-    def retranslateUi(self, UstawieniaDialog):
-        UstawieniaDialog.setWindowTitle(_translate("UstawieniaDialog", "Adaptive: Plugin settings", None))
-        self.label_2.setText(_translate("UstawieniaDialog", "Database", None))
+    def retranslateUi(self, SettingsDialog):
+        SettingsDialog.setWindowTitle(_translate("SettingsDialog", "GEOPANEL: Ustawienia wtyczki", None))
+        self.label_2.setText(_translate("SettingsDialog", "Baza danych", None))
 
 import resources_rc

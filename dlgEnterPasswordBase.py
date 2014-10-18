@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'dlgHasloPodajBase.ui'
+# Form implementation generated from reading ui file 'dlgEnterPasswordBase.ui'
 #
-# Created: Thu Dec 19 20:04:37 2013
-#      by: PyQt4 UI code generator 4.10.3
+# Created: Sat Oct 18 21:16:07 2014
+#      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -23,36 +23,36 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
-class Ui_PodajHasloDialogBase(object):
-    def setupUi(self, PodajHasloDialogBase):
-        PodajHasloDialogBase.setObjectName(_fromUtf8("PodajHasloDialogBase"))
-        PodajHasloDialogBase.resize(440, 121)
-        self.gridLayout = QtGui.QGridLayout(PodajHasloDialogBase)
+class Ui_EnterPasswordDialogBase(object):
+    def setupUi(self, EnterPasswordDialogBase):
+        EnterPasswordDialogBase.setObjectName(_fromUtf8("EnterPasswordDialogBase"))
+        EnterPasswordDialogBase.resize(440, 121)
+        self.gridLayout = QtGui.QGridLayout(EnterPasswordDialogBase)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.label_3 = QtGui.QLabel(PodajHasloDialogBase)
+        self.label_3 = QtGui.QLabel(EnterPasswordDialogBase)
         self.label_3.setObjectName(_fromUtf8("label_3"))
         self.gridLayout.addWidget(self.label_3, 0, 0, 1, 2)
-        self.label = QtGui.QLabel(PodajHasloDialogBase)
+        self.label = QtGui.QLabel(EnterPasswordDialogBase)
         self.label.setObjectName(_fromUtf8("label"))
         self.gridLayout.addWidget(self.label, 1, 0, 1, 1)
-        self.lineUser = QtGui.QLineEdit(PodajHasloDialogBase)
+        self.lineUser = QtGui.QLineEdit(EnterPasswordDialogBase)
         self.lineUser.setObjectName(_fromUtf8("lineUser"))
         self.gridLayout.addWidget(self.lineUser, 1, 1, 1, 1)
-        self.label_2 = QtGui.QLabel(PodajHasloDialogBase)
+        self.label_2 = QtGui.QLabel(EnterPasswordDialogBase)
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.gridLayout.addWidget(self.label_2, 2, 0, 1, 1)
-        self.linePass = QtGui.QLineEdit(PodajHasloDialogBase)
+        self.linePass = QtGui.QLineEdit(EnterPasswordDialogBase)
         self.linePass.setEchoMode(QtGui.QLineEdit.Password)
         self.linePass.setObjectName(_fromUtf8("linePass"))
         self.gridLayout.addWidget(self.linePass, 2, 1, 1, 1)
-        self.buttonBox = QtGui.QDialogButtonBox(PodajHasloDialogBase)
+        self.buttonBox = QtGui.QDialogButtonBox(EnterPasswordDialogBase)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
         self.gridLayout.addWidget(self.buttonBox, 4, 0, 1, 2)
         spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.gridLayout.addItem(spacerItem, 3, 0, 1, 1)
-        self.labelError = QtGui.QLabel(PodajHasloDialogBase)
+        self.labelError = QtGui.QLabel(EnterPasswordDialogBase)
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
         brush.setStyle(QtCore.Qt.SolidPattern)
@@ -78,15 +78,15 @@ class Ui_PodajHasloDialogBase(object):
         self.label.setBuddy(self.lineUser)
         self.label_2.setBuddy(self.linePass)
 
-        self.retranslateUi(PodajHasloDialogBase)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), PodajHasloDialogBase.accept)
-        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), PodajHasloDialogBase.reject)
-        QtCore.QMetaObject.connectSlotsByName(PodajHasloDialogBase)
+        self.retranslateUi(EnterPasswordDialogBase)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("accepted()")), EnterPasswordDialogBase.accept)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL(_fromUtf8("rejected()")), EnterPasswordDialogBase.reject)
+        QtCore.QMetaObject.connectSlotsByName(EnterPasswordDialogBase)
 
-    def retranslateUi(self, PodajHasloDialogBase):
-        PodajHasloDialogBase.setWindowTitle(_translate("PodajHasloDialogBase", "Password required", None))
-        self.label_3.setText(_translate("PodajHasloDialogBase", "Please provide you Adaptive username and password", None))
-        self.label.setText(_translate("PodajHasloDialogBase", "Username", None))
-        self.label_2.setText(_translate("PodajHasloDialogBase", "Password", None))
-        self.labelError.setText(_translate("PodajHasloDialogBase", "Error!", None))
+    def retranslateUi(self, EnterPasswordDialogBase):
+        EnterPasswordDialogBase.setWindowTitle(_translate("EnterPasswordDialogBase", "Podaj hasło", None))
+        self.label_3.setText(_translate("EnterPasswordDialogBase", "Proszę wprowadzić dane uwierzytelniające do bazy danych", None))
+        self.label.setText(_translate("EnterPasswordDialogBase", "Użytkownik", None))
+        self.label_2.setText(_translate("EnterPasswordDialogBase", "Hasło", None))
+        self.labelError.setText(_translate("EnterPasswordDialogBase", "BŁĄD", None))
 

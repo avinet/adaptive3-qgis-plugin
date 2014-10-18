@@ -6,12 +6,12 @@ import adaptive_data
 from adaptive_data import *     #db,ustawienia, tabele...
 from resources_rc import *
 
-from dlgHasloPodaj import PodajHasloDialog
-from dlgProjekty import ProjektyDialog
-from dlgUstawienia import UstawieniaDialog
-from dlgPublicznyWewnetrzny import PublicznyWewnetrznyDialog
+from dlgEnterPassword import EnterPasswordDialog
+from dlgProjects import ProjectsDialog
+from dlgSettings import SettingsDialog
+from dlgPublicPrivate import PublicPrivateDialog
 
-from publikowanie import host, authenticate, walidujProjekt, uploadProjectFile, listProjectFiles
+from publishing import host, authenticate, walidujProjekt, uploadProjectFile, listProjectFiles
 
 
 
@@ -32,9 +32,9 @@ class AdaptivePlugin():
         self.action7.setToolTip(u'Adaptive: Publish QGIS project to server')
         self.action8.setToolTip(u'Adaptive: Settings')
 
-        self.action6.triggered.connect(self.runProjekty)
+        self.action6.triggered.connect(self.runProjects)
         self.action7.triggered.connect(self.runPublikuj)
-        self.action8.triggered.connect(self.runUstawienia)
+        self.action8.triggered.connect(self.runSettings)
 
         self.toolBar = self.iface.addToolBar("Adaptive")
         self.toolBar.setObjectName('Adaptive')
@@ -52,7 +52,7 @@ class AdaptivePlugin():
 
 
 
-    def polacz(self, host, dbname, user, password, port):
+    def connect(self, host, dbname, user, password, port):
         db.setHostName(host)
         db.setDatabaseName(dbname)
         db.setUserName(user)
@@ -68,7 +68,7 @@ class AdaptivePlugin():
 
     def initDatabase(self):
         settings = QSettings()
-        selected = ustawienia('bazaDanych')
+        selected = settings('bazaDanych')
         if not selected:
             QMessageBox.critical(self.iface.mainWindow(), u"Adaptive", u"No database connection defined. Please set one using Settings option.")
             return 1
@@ -81,12 +81,12 @@ class AdaptivePlugin():
         port = settings.value("port", type=int)
         # qgis1.5 use 'savePassword' instead of 'save' setting
         if settings.value("save", "f", type=unicode).upper()=='TRUE' or ( settings.value("savePassword", "f", type=unicode).upper()=='TRUE' and settings.value("saveUsername", "f", type=unicode).upper()=='TRUE' ):
-            result = self.polacz(host, dbname, username, password, port)
+            result = self.connect(host, dbname, username, password, port)
         else:
             result = None
             pytaj = True
             while pytaj:
-                dlg = PodajHasloDialog(self.iface.mainWindow())
+                dlg = EnterPasswordDialog(self.iface.mainWindow())
                 dlg.lineUser.setText(username)
                 dlg.linePass.setText(password)
                 if username: dlg.linePass.setFocus()
@@ -98,7 +98,7 @@ class AdaptivePlugin():
                 if dlg.result():
                     username = dlg.lineUser.text()
                     password = dlg.linePass.text()
-                    result = self.polacz(host, dbname, username, password, port)
+                    result = self.connect(host, dbname, username, password, port)
                     if not result:
                         # sukces
                         pytaj = False
@@ -125,18 +125,18 @@ class AdaptivePlugin():
 
 
 
-    def runUstawienia(self):
+    def runSettings(self):
         settings = QSettings()
         selected = settings.value("/PostgreSQL/connections/selected", "", type=unicode)
         if not selected:
             QMessageBox.critical(self.iface.mainWindow(), u"Adaptive", u"No database connections defined.")
         else:
-            dialog = UstawieniaDialog(self.iface)
+            dialog = SettingsDialog(self.iface)
             dialog.exec_()
 
 
 
-    def runProjekty(self):
+    def runProjects(self):
         if not db.isOpen(): self.initDatabase()
         if not db.isOpen(): return
 
@@ -149,7 +149,7 @@ class AdaptivePlugin():
                 ok,resp = listProjectFiles()
                 QApplication.restoreOverrideCursor()
             if not ok:
-                dlg = PodajHasloDialog(self.iface.mainWindow())
+                dlg = EnterPasswordDialog(self.iface.mainWindow())
                 dlg.label_3.setText(u"Please provide your Adaptive username and password")
                 dlg.labelError.hide()
                 dlg.lineUser.setText(adaptive_data.token_username)
@@ -169,7 +169,7 @@ class AdaptivePlugin():
         if not len(resp):
             QMessageBox.information(self.iface.mainWindow(), u"Adaptive: Error", u"No projects published.")
             return
-        dialog = ProjektyDialog(self.iface, resp)
+        dialog = ProjectsDialog(self.iface, resp)
         dialog.exec_()
 
 
@@ -189,7 +189,7 @@ class AdaptivePlugin():
 
         wmsUrl = 'http://%s/%s/%s' % (host, db.databaseName(), fileName)
 
-        dialog = PublicznyWewnetrznyDialog(self.iface, wmsUrl)
+        dialog = PublicPrivateDialog(self.iface, wmsUrl)
         dialog.exec_()
         if not dialog.rezultat:
             return
@@ -203,7 +203,7 @@ class AdaptivePlugin():
                 (ok,result) = uploadProjectFile(self.iface, filePath, (dialog.rezultat==2))
                 QApplication.restoreOverrideCursor()
             if not ok:
-                dlg = PodajHasloDialog(self.iface.mainWindow())
+                dlg = EnterPasswordDialog(self.iface.mainWindow())
                 dlg.label_3.setText(u"Please provide your Adaptive username and password")
                 dlg.labelError.hide()
                 dlg.lineUser.setText(adaptive_data.token_username)
