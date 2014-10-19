@@ -5,7 +5,6 @@ from PyQt4.QtGui import *
 from qgis.core import *
 
 import adaptive_data
-from adaptive_data import db
 
 import json
 import urllib2, cookielib
@@ -15,24 +14,6 @@ from multipartposthandler import MultipartPostHandler
 # adres serwera do downloadu i uploadu projektów. W kolejnych funkcjach zdefinio
 host = 'localhost:82'
 selector = 'pluginservice/api/qgis'
-
-def connectionStringOk(conn):
-    ''' sprawdza,czy conn string nie prowadzi do nieuprawnionej bazy danych
-        params: unicode źródło danych warstwy (w wypadku bazy postgres jest to connection string)
-        returns: bool wynik (True gdy ok)
-    '''
-    pairs=conn.split(' ')
-    params = {}
-    for pair in pairs:
-        pair = pair.split('=')
-        if len(pair)==2:
-            params[pair[0]] = pair[1].replace("'","")
-    if not params.has_key('dbname'):
-        return False
-    if params['dbname'] != db.databaseName():
-        return False
-    return True
-
 
 def validateProject(iface, filePath):
     ''' Sprawdza, czy projekt nadaje się do wysłania
@@ -51,14 +32,6 @@ def validateProject(iface, filePath):
         p = layer.dataProvider()
         if not p or not p.name() in ( 'postgres', 'gdal', 'wms' ):
             return ( False, u'Project can not be published because it has layers based on unsupported sources: %s' % layer.name())
-
-    #for layer in iface.mapCanvas().layers():
-        #if layer.dataProvider().name() == 'postgres' and layer.crs().authid() != 'EPSG:2180':
-            #return ( False, u'Usługa nie może zostać wyeksportowana, ponieważ zawiera warstwę w układzie współrzędnych innym, niż PUWG92: %s' % layer.name())
-
-    for layer in iface.mapCanvas().layers():
-        if layer.dataProvider().name() == 'postgres' and not connectionStringOk( layer.source() ):
-            return ( False, u'Project cannot be published, because at least one PostGIS layer is in wrong database: %s' % layer.name())
 
     proj = QgsProject.instance()
     if proj.isDirty() or not filePath:

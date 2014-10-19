@@ -9,7 +9,7 @@ token = "" # global variable for authentication token
 token_username = "" # global variable for authentication data
 token_password = "" # global variable for authentication data
 
-db = QSqlDatabase.addDatabase("QPSQL")
+serviceName = "adaptiveServiceName"
 
 def settings(context, default=None, format=unicode):
     if not default:
@@ -21,9 +21,3 @@ def settings(context, default=None, format=unicode):
         return settings.value('/AdaptivePlugin/'+ context, default, type=unicode).upper() in ['TRUE', 'TAK']
     else:
         return settings.value('/AdaptivePlugin/'+ context, default, type=unicode)
-
-
-
-def setSettings(context, value):
-    settings = QSettings()
-    return settings.setValue('/AdaptivePlugin/'+ context, value)
