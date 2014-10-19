@@ -29,7 +29,7 @@ class AdaptivePlugin():
         self.action7.setToolTip(u'Adaptive: Publish QGIS project to server')
 
         self.action6.triggered.connect(self.runProjects)
-        self.action7.triggered.connect(self.runPublikuj)
+        self.action7.triggered.connect(self.runPublish)
 
         self.toolBar = self.iface.addToolBar("Adaptive")
         self.toolBar.setObjectName('Adaptive')
@@ -41,7 +41,6 @@ class AdaptivePlugin():
         menuBar.insertMenu(lastAction, self.menu)
 
         for i in [self.action6, self.action7]:
-            #self.iface.addPluginToMenu('Adaptive', i)
             self.menu.addAction(i)
             self.toolBar.addAction(i)
 
@@ -58,8 +57,8 @@ class AdaptivePlugin():
     def runProjects(self):
         resp = ""
         ok = False
-        pytaj = True
-        while not ok and pytaj:
+        askForCredentials = True
+        while not ok and askForCredentials:
             if adaptive_data.token:
                 QApplication.setOverrideCursor(Qt.WaitCursor)
                 ok,resp = listProjectFiles()
@@ -78,7 +77,7 @@ class AdaptivePlugin():
                     adaptive_data.token = authenticate(adaptive_data.token_username, adaptive_data.token_password)
                 else:
                     #zaniechano
-                    pytaj = False
+                    askForCredentials = False
         if not ok:
             QMessageBox.critical(self.iface.mainWindow(), u"Adaptive: Error", u"Unable to read project list")
             return
@@ -90,22 +89,20 @@ class AdaptivePlugin():
 
 
 
-    def runPublikuj(self):
+    def runPublish(self):
         proj = QgsProject.instance()
         filePath = proj.fileName()
         fileName = QFileInfo(filePath).fileName()
 
         (ok, result) = validateProject(self.iface, filePath)
         if not ok:
-            QMessageBox.critical(self.iface.mainWindow(), u'Błąd!', result)
+            QMessageBox.critical(self.iface.mainWindow(), u'Error!', result)
             return
-
-        wmsUrl = 'http://%s/%s/%s' % (host, serviceName, fileName)
 
         result = ""
         ok = False
-        pytaj = True
-        while not ok and pytaj:
+        askForCredentials = True
+        while not ok and askForCredentials:
             if adaptive_data.token:
                 QApplication.setOverrideCursor(Qt.WaitCursor)
                 (ok,result) = uploadProjectFile(self.iface, filePath)
@@ -124,7 +121,7 @@ class AdaptivePlugin():
                     adaptive_data.token = authenticate(adaptive_data.token_username, adaptive_data.token_password)
                 else:
                     #zaniechano
-                    pytaj = False
+                    askForCredentials = False
 
         if not ok:
             QMessageBox.critical(self.iface.mainWindow(), u'Error!', result)

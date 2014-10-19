@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'dlgEnterPasswordBase.ui'
 #
-# Created: Sat Oct 18 21:16:07 2014
-#      by: PyQt4 UI code generator 4.10.2
+# Created: Sun Oct 19 23:09:48 2014
+#      by: PyQt4 UI code generator 4.11.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_EnterPasswordDialogBase(object):
     def setupUi(self, EnterPasswordDialogBase):
         EnterPasswordDialogBase.setObjectName(_fromUtf8("EnterPasswordDialogBase"))
-        EnterPasswordDialogBase.resize(440, 121)
+        EnterPasswordDialogBase.resize(440, 125)
         self.gridLayout = QtGui.QGridLayout(EnterPasswordDialogBase)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
         self.label_3 = QtGui.QLabel(EnterPasswordDialogBase)
@@ -84,9 +84,9 @@ class Ui_EnterPasswordDialogBase(object):
         QtCore.QMetaObject.connectSlotsByName(EnterPasswordDialogBase)
 
     def retranslateUi(self, EnterPasswordDialogBase):
-        EnterPasswordDialogBase.setWindowTitle(_translate("EnterPasswordDialogBase", "Podaj hasło", None))
-        self.label_3.setText(_translate("EnterPasswordDialogBase", "Proszę wprowadzić dane uwierzytelniające do bazy danych", None))
-        self.label.setText(_translate("EnterPasswordDialogBase", "Użytkownik", None))
-        self.label_2.setText(_translate("EnterPasswordDialogBase", "Hasło", None))
-        self.labelError.setText(_translate("EnterPasswordDialogBase", "BŁĄD", None))
+        EnterPasswordDialogBase.setWindowTitle(_translate("EnterPasswordDialogBase", "Log in", None))
+        self.label_3.setText(_translate("EnterPasswordDialogBase", "Please enter your credentials to the Adaptive service", None))
+        self.label.setText(_translate("EnterPasswordDialogBase", "Login", None))
+        self.label_2.setText(_translate("EnterPasswordDialogBase", "Password", None))
+        self.labelError.setText(_translate("EnterPasswordDialogBase", "ERROR", None))
 

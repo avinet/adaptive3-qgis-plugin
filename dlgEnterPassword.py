@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-#from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from dlgHasloPodajBase import Ui_PodajHasloDialogBase
+from dlgEnterPasswordBase import Ui_EnterPasswordDialogBase
 
 
 class EnterPasswordDialog(QDialog, Ui_EnterPasswordDialogBase):

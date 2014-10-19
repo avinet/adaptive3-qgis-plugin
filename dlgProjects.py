@@ -13,46 +13,46 @@ from publishing import authenticate, listProjectFiles, deleteProjectFile, readPr
 
 
 class ProjectsDialog(QDialog, Ui_ProjectsDialog):
-    def __init__(self, iface, projekty):
+    def __init__(self, iface, projects):
         QDialog.__init__(self)
         self.iface = iface
         self.setupUi(self)
-        self.projekty = projekty
-        self.buttonWczytaj.setEnabled(False)
-        self.buttonUsun.setEnabled(False)
-        self.buttonUsun.released.connect(self.deleteProject)
-        self.buttonWczytaj.released.connect(self.loadProject)
-        self.treeProjekty.itemSelectionChanged.connect(self.selectionChanged)
+        self.projects = projects
+        self.buttonLoad.setEnabled(False)
+        self.buttonRemove.setEnabled(False)
+        self.buttonRemove.released.connect(self.deleteProject)
+        self.buttonLoad.released.connect(self.loadProject)
+        self.treeProjects.itemSelectionChanged.connect(self.selectionChanged)
         self.fillTree()
 
 
 
     def fillTree(self):
-        self.treeProjekty.clear()
-        for projekt in self.projekty:
-                item = QTreeWidgetItem(self.treeProjekty)
-                item.setText(0, projekt['fileName'] )
-        self.treeProjekty.resizeColumnToContents(0)
+        self.treeProjects.clear()
+        for project in self.projects:
+                item = QTreeWidgetItem(self.treeProjects)
+                item.setText(0, project['fileName'] )
+        self.treeProjects.resizeColumnToContents(0)
 
 
 
     def selectionChanged(self):
-        cosWybrano = bool(self.treeProjekty.selectedItems())
-        self.buttonUsun.setEnabled( cosWybrano )
-        self.buttonWczytaj.setEnabled( cosWybrano )
+        isSelection = bool(self.treeProjects.selectedItems())
+        self.buttonRemove.setEnabled( isSelection )
+        self.buttonLoad.setEnabled( isSelection )
 
 
 
     def deleteProject(self):
-        if not bool(self.treeProjekty.selectedItems()):
+        if not bool(self.treeProjects.selectedItems()):
             return
-        fileName = self.treeProjekty.selectedItems()[0].text(0)
+        fileName = self.treeProjects.selectedItems()[0].text(0)
         if QMessageBox.question(self, "Adaptive", u"Are you sure you want to remove service %s?\nOperation can not be reversed!" % fileName, QMessageBox.Yes, QMessageBox.No) == QMessageBox.Yes:
 
             result = ""
             ok = False
-            pytaj = True
-            while not ok and pytaj:
+            askForCredentials = True
+            while not ok and askForCredentials:
                 if adaptive_data.token:
                     QApplication.setOverrideCursor(Qt.WaitCursor)
                     ok,result = deleteProjectFile(unicode(fileName))
@@ -70,27 +70,26 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
                         adaptive_data.token_password = dlg.linePass.text()
                         adaptive_data.token = authenticate(adaptive_data.token_username, adaptive_data.token_password)
                     else:
-                        #zaniechano
-                        pytaj = False
+                        askForCredentials = False
             if not ok:
                 QMessageBox.critical(self, u'Error!', u'Unable to write data to Adaptive')
                 return
             ok,resp = listProjectFiles()
             if ok:
-                self.projekty = resp
+                self.projects = resp
             self.fillTree()
 
 
 
     def loadProject(self):
-        if not bool(self.treeProjekty.selectedItems()):
+        if not bool(self.treeProjects.selectedItems()):
             return
-        fileName = self.treeProjekty.selectedItems()[0].text(0)
+        fileName = self.treeProjects.selectedItems()[0].text(0)
 
         xml = ""
         ok = False
-        pytaj = True
-        while not ok and pytaj:
+        askForCredentials = True
+        while not ok and askForCredentials:
             if adaptive_data.token:
                 QApplication.setOverrideCursor(Qt.WaitCursor)
                 ok, xml = readProjectFile(unicode(fileName))
@@ -108,18 +107,17 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
                     adaptive_data.token_password = dlg.linePass.text()
                     adaptive_data.token = authenticate(adaptive_data.token_username, adaptive_data.token_password)
                 else:
-                    #zaniechano
-                    pytaj = False
+                    askForCredentials = False
         if not ok:
             QMessageBox.critical(self, u'Error!', u'Unable to read data from Adaptive')
             return
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        projektPlik = QFile( QDir.tempPath()+'/'+fileName )
-        projektPlik.open(QIODevice.ReadWrite)
-        projektPlik.write(xml)
-        projektPlik.close()
+        projectFile = QFile( QDir.tempPath()+'/'+fileName )
+        projectFile.open(QIODevice.ReadWrite)
+        projectFile.write(xml)
+        projectFile.close()
         proj = QgsProject.instance()
-        proj.read(QFileInfo(projektPlik.fileName()))
+        proj.read(QFileInfo(projectFile.fileName()))
         QApplication.restoreOverrideCursor()
         self.close()
 

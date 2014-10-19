@@ -9,8 +9,6 @@ token = "" # global variable for authentication token
 token_username = "" # global variable for authentication data
 token_password = "" # global variable for authentication data
 
-serviceName = "adaptiveServiceName"
-
 def settings(context, default=None, format=unicode):
     if not default:
       default = ''

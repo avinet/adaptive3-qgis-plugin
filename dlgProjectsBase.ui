@@ -29,11 +29,11 @@
    <enum>Qt::DefaultContextMenu</enum>
   </property>
   <property name="windowTitle">
-   <string>GEOPANEL: Usługi WMS</string>
+   <string>Adaptive services</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="4">
-    <widget class="QTreeWidget" name="treeProjekty">
+    <widget class="QTreeWidget" name="treeProjects">
      <property name="rootIsDecorated">
       <bool>false</bool>
      </property>
@@ -45,30 +45,22 @@
      </attribute>
      <column>
       <property name="text">
-       <string>plik</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>opis</string>
-      </property>
-      <property name="textAlignment">
-       <set>AlignRight|AlignVCenter</set>
+       <string>file</string>
       </property>
      </column>
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QPushButton" name="buttonUsun">
+    <widget class="QPushButton" name="buttonRemove">
      <property name="text">
-      <string>Usuń</string>
+      <string>Delete</string>
      </property>
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QPushButton" name="buttonWczytaj">
+    <widget class="QPushButton" name="buttonLoad">
      <property name="text">
-      <string>Wczytaj</string>
+      <string>Load</string>
      </property>
     </widget>
    </item>
@@ -94,10 +86,10 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>treeProjekty</tabstop>
-  <tabstop>buttonWczytaj</tabstop>
+  <tabstop>treeProjects</tabstop>
+  <tabstop>buttonLoad</tabstop>
   <tabstop>buttonBox</tabstop>
-  <tabstop>buttonUsun</tabstop>
+  <tabstop>buttonRemove</tabstop>
  </tabstops>
  <resources>
   <include location="resources.qrc"/>
