@@ -87,9 +87,9 @@ def authenticate(username, password):
         return ""
 
 
-def uploadProjectFile(iface, filePath, publiczny):
+def uploadProjectFile(iface, filePath):
     ''' Uploaduj plik projektu na serwer
-        params: QgsInterface instancja interfejsu QGIS-a, unicode ścieżka do pliku projektu, bool publiczność projektu
+        params: QgsInterface instancja interfejsu QGIS-a, unicode ścieżka do pliku projektu
         returns: bool wynik (True gdy ok), unicode komunikat błędu
     '''
 
@@ -100,7 +100,6 @@ def uploadProjectFile(iface, filePath, publiczny):
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandler) #zwraca OpenerDirector
 
     params = { "filename": fileName,
-               "isPublic": str(publiczny),
                "file" : open(filePath, "rb") }
 
     try:

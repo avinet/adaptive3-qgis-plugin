@@ -9,7 +9,6 @@ from resources_rc import *
 from dlgEnterPassword import EnterPasswordDialog
 from dlgProjects import ProjectsDialog
 from dlgSettings import SettingsDialog
-from dlgPublicPrivate import PublicPrivateDialog
 
 from publishing import host, authenticate, walidujProjekt, uploadProjectFile, listProjectFiles
 
@@ -189,18 +188,13 @@ class AdaptivePlugin():
 
         wmsUrl = 'http://%s/%s/%s' % (host, db.databaseName(), fileName)
 
-        dialog = PublicPrivateDialog(self.iface, wmsUrl)
-        dialog.exec_()
-        if not dialog.rezultat:
-            return
-
         result = ""
         ok = False
         pytaj = True
         while not ok and pytaj:
             if adaptive_data.token:
                 QApplication.setOverrideCursor(Qt.WaitCursor)
-                (ok,result) = uploadProjectFile(self.iface, filePath, (dialog.rezultat==2))
+                (ok,result) = uploadProjectFile(self.iface, filePath)
                 QApplication.restoreOverrideCursor()
             if not ok:
                 dlg = EnterPasswordDialog(self.iface.mainWindow())
@@ -223,5 +217,3 @@ class AdaptivePlugin():
             return
 
         QMessageBox.information(self.iface.mainWindow(), u'Adaptive', u'Project has been published in Adaptive. You can now create a new Theme based on QGIS Project <b>%s</b>.' % result)
-
-        # TODO!!!! WYEKSPORTUJ ROWNIEZ RASTRY

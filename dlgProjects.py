@@ -3,7 +3,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.QtXml import QDomDocument
 from qgis.core import *
-from dlgProjektyBase import Ui_ProjektyDialog
+from dlgProjectsBase import Ui_ProjectsDialog
 from dlgEnterPassword import EnterPasswordDialog
 import adaptive_data
 from adaptive_data import *
@@ -31,19 +31,7 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
         self.treeProjekty.clear()
         for projekt in self.projekty:
                 item = QTreeWidgetItem(self.treeProjekty)
-
                 item.setText(0, projekt['fileName'] )
-
-                if projekt.has_key('isPublic'):
-                    publiczna = bool(projekt['isPublic'])
-                else:
-                    publiczna = False
-
-                item.setText(1, publiczna and u'public' or u'private')
-
-                item.setForeground(1,QBrush(QColor( publiczna and QColor(0, 128, 0) or QColor(145, 0, 0))))
-
-
         self.treeProjekty.resizeColumnToContents(0)
 
 
