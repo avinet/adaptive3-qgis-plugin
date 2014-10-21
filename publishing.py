@@ -25,16 +25,16 @@ def validateProject(iface, filePath):
     '''
 
     if not len(iface.mapCanvas().layers()):
-        return ( False, u'There are no layers in this project.' )
+        return ( False, QCoreApplication.translate('publishing', u'There are no layers in this project.') )
 
     for layer in iface.mapCanvas().layers():
         p = layer.dataProvider()
         if not p or not p.name() in ( 'postgres', 'gdal', 'wms' ):
-            return ( False, u'Project can not be published because it has layers based on unsupported sources: %s' % layer.name())
+            return ( False, QCoreApplication.translate('publishing', u'Project can not be published because it has layers based on unsupported sources:') + ' ' + layer.name())
 
     proj = QgsProject.instance()
     if proj.isDirty() or not filePath:
-        return ( False, u'You have unsaved changes. Please save before publishing.' )
+        return ( False, QCoreApplication.translate('publishing', u'You have unsaved changes. Please save before publishing.') )
 
     return ( True, None )
 
@@ -86,7 +86,7 @@ def uploadProjectFile(iface, filePath):
             result = json.loads(e.read())
             return ( True, False, unicode(result['Message']) )
     except:
-        return ( False, False, u'Error while writing data to Adaptive!' )
+        return ( False, False, QCoreApplication.translate('publishing', u'Error while writing data to Adaptive!') )
     return (True, True, '%s' % (fileName))
 
 
@@ -110,7 +110,7 @@ def listProjectFiles():
             result = json.loads(e.read())
             return ( True, False, unicode(result['Message']) )
     except:
-        return ( False, False, u'Error while reading data from Adaptive!' )
+        return ( False, False, QCoreApplication.translate('publishing', u'Error while reading data from Adaptive!') )
 
     return (True, True, json.loads(f.read()))
 
@@ -159,5 +159,5 @@ def readProjectFile(fileName):
             result = json.loads(e.read())
             return ( True, False, unicode(result['Message']) )
     except:
-        return ( False, False, u'Error while reading data from Adaptive!' )
+        return ( False, False, QCoreApplication.translate('publishing', u'Error while reading data from Adaptive!') )
     return (True, True, f.read())

@@ -47,7 +47,7 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
         if not bool(self.treeProjects.selectedItems()):
             return
         fileName = self.treeProjects.selectedItems()[0].text(0)
-        if QMessageBox.question(self, "Adaptive", u"Are you sure you want to remove service %s?\nOperation can not be reversed!" % fileName, QMessageBox.Yes, QMessageBox.No) == QMessageBox.Yes:
+        if QMessageBox.question(self, self.tr("Adaptive"), self.tr(u"Are you sure you want to remove service %s?\nOperation can not be reversed!") % fileName, QMessageBox.Yes, QMessageBox.No) == QMessageBox.Yes:
 
             errorMessage = ""
             operationOk = False
@@ -60,7 +60,7 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
                     QApplication.restoreOverrideCursor()
                 if not authOk:
                     dlg = EnterPasswordDialog(self.iface.mainWindow())
-                    dlg.label_3.setText(u"Please provide your Adaptive username and password")
+                    dlg.label_3.setText(self.tr(u"Please provide your Adaptive username and password"))
                     dlg.labelError.hide()
                     dlg.lineUser.setText(adaptive_data.token_username)
                     dlg.linePass.setText(adaptive_data.token_password)
@@ -75,7 +75,7 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
                 else:
                     askForCredentials = False
             if not operationOk:
-                QMessageBox.critical(self, u'Error!', errorMessage)
+                QMessageBox.critical(self, self.tr(u'Error!'), errorMessage)
                 return
             authOk,operationOk,resp = listProjectFiles()
             if authOk and operationOk:
@@ -100,7 +100,7 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
                 QApplication.restoreOverrideCursor()
             if not authOk:
                 dlg = EnterPasswordDialog(self.iface.mainWindow())
-                dlg.label_3.setText(u"Please provide you Adaptive username and password")
+                dlg.label_3.setText(self.tr(u"Please provide you Adaptive username and password"))
                 dlg.labelError.hide()
                 dlg.lineUser.setText(adaptive_data.token_username)
                 dlg.linePass.setText(adaptive_data.token_password)
@@ -115,7 +115,7 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
             else:
                 askForCredentials = False
         if not operationOk:
-            QMessageBox.critical(self, u'Error!', xmlOrError)
+            QMessageBox.critical(self, self.tr(u'Error!'), xmlOrError)
             return
         QApplication.setOverrideCursor(Qt.WaitCursor)
         projectFile = QFile( QDir.tempPath()+'/'+fileName )
