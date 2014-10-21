@@ -19,19 +19,15 @@ host = 'localhost:8080'
 selector = 'a_a3_pluginservice/api/qgis'
 
 def validateProject(iface, filePath):
-    ''' Sprawdza, czy projekt nadaje się do wysłania
-        params: QgsInterface instancja interfejsu QGIS-a, unicode ścieżka do pliku projektu
-        returns: bool wynik (True gdy ok), unicode komunikat błędu
+    ''' Validates if the project file meets Adaptive's requirements
+        params: QgsInterface QGIS interface instance, unicode project file path
+        returns: bool projectOk, unicode error message
     '''
 
     if not len(iface.mapCanvas().layers()):
         return ( False, u'There are no layers in this project.' )
 
-    #if iface.mapCanvas().mapRenderer().destinationCrs().authid() != 'EPSG:2180':
-            #return ( False, u'Usługa nie może zostać wyeksportowana, ponieważ jest w innym niż PUWG92 układzie współrzędnych.')
-
     for layer in iface.mapCanvas().layers():
-        #if layer.type() != layer.VectorLayer:
         p = layer.dataProvider()
         if not p or not p.name() in ( 'postgres', 'gdal', 'wms' ):
             return ( False, u'Project can not be published because it has layers based on unsupported sources: %s' % layer.name())
@@ -44,8 +40,8 @@ def validateProject(iface, filePath):
 
 
 def authenticate(username, password):
-    ''' Uwierzytelnij w serwisie Adaptive
-        params:
+    ''' Authenticates the user in the Adaptive service
+        params: string username, string password
         returns: string token
     '''
 
@@ -64,16 +60,16 @@ def authenticate(username, password):
 
 
 def uploadProjectFile(iface, filePath):
-    ''' Uploaduj plik projektu na serwer
-        params: QgsInterface instancja interfejsu QGIS-a, unicode ścieżka do pliku projektu
+    ''' Uploads project file to the Adaptive service
+        params: QgsInterface QGIS interface instance, unicode project file path
         returns: bool AuthenticationOk, bool OperationOk, unicode file path (if ok) or error message (if not ok)
     '''
 
     fileName = QFileInfo(filePath).fileName()
-    fileName = unicode(fileName) # dla zgodnosci z post_multipart
-    filePath = unicode(filePath) # dla zgodnosci z post_multipart
+    fileName = unicode(fileName) # for compatibility with post_multipart
+    filePath = unicode(filePath) # for compatibility with post_multipart
     cookies = cookielib.CookieJar()
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandler) #zwraca OpenerDirector
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandler) #returns OpenerDirector instance
 
     params = { "filename": fileName,
                "file" : open(filePath, "rb") }
@@ -95,7 +91,7 @@ def uploadProjectFile(iface, filePath):
 
 
 def listProjectFiles():
-    ''' Listuj pliki projektów na serwerze
+    ''' Lists project files in the Adaptive service
         params:
         returns: bool AuthenticationOk, bool OperationOk, list of dicts: projects information (if ok) or error message (if not ok)
     '''
@@ -120,8 +116,8 @@ def listProjectFiles():
 
 
 def deleteProjectFile(fileName):
-    ''' usuń plik projektu z serwera
-        params: unicode nazwa pliku projektu
+    ''' Deletes a project file from the Adaptive service
+        params: unicode project file name
         returns: bool AuthenticationOk, bool OperationOk, unicode error message
     '''
 
@@ -144,9 +140,8 @@ def deleteProjectFile(fileName):
 
 
 def readProjectFile(fileName):
-    ''' czytaj plik projektu z serwera
-        params: unicode nazwa pliku projektu
-        returns: bool wynik (True gdy ok), unicode treść pliku projektu
+    ''' Reads a project file from the Adaptive service
+        params: unicode project file name
         returns: bool AuthenticationOk, bool OperationOk, unicode file content (if ok) or error message (if not ok)
     '''
 
