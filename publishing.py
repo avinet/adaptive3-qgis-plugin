@@ -11,9 +11,12 @@ import urllib2, cookielib
 from multipartposthandler import MultipartPostHandler
 
 
-# adres serwera do downloadu i uploadu projektów. W kolejnych funkcjach zdefinio
-host = 'localhost:82'
-selector = 'pluginservice/api/qgis'
+# Configuration: PluginService hostname and port number. No trailing slash or protocol scheme.
+# Example: 'pluginservice.utvikling.avinet.no'
+host = 'localhost:8080'
+# Configuration: PluginService relative path, without trailing or leading slash.
+# Example (for pluginservice as separate site): 'api/qgis'
+selector = 'a_a3_pluginservice/api/qgis'
 
 def validateProject(iface, filePath):
     ''' Sprawdza, czy projekt nadaje się do wysłania
@@ -75,8 +78,11 @@ def uploadProjectFile(iface, filePath):
     params = { "filename": fileName,
                "file" : open(filePath, "rb") }
 
+    request = urllib2.Request("http://%s/%s" % (host,selector), params)
+    request.add_header('X-Adaptive-AuthToken', adaptive_data.token)
+
     try:
-        opener.open("http://%s/%s?token=%s" % (host,selector,str(adaptive_data.token)), params)
+        opener.open(request)
     except:
         return ( False, u'Error while writing data to Adaptive!' )
     return (True, '%s' % (fileName))
@@ -90,9 +96,13 @@ def listProjectFiles():
 
     cookies = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandler) #zwraca OpenerDirector
+    request = urllib2.Request("http://%s/%s" % (host,selector))
+    request.add_header('X-Adaptive-AuthToken', adaptive_data.token)
+
     try:
-        f = opener.open("http://%s/%s?token=%s" % (host,selector,adaptive_data.token))
-    except:
+        f = opener.open(request)
+    except e:
+
         return ( False, None )
     return (True, json.loads(f.read()))
 
@@ -104,7 +114,8 @@ def deleteProjectFile(fileName):
     '''
 
     opener = urllib2.build_opener(urllib2.HTTPHandler)
-    request = urllib2.Request("http://%s/%s/%s?token=%s" % (host,selector,fileName,adaptive_data.token))
+    request = urllib2.Request("http://%s/%s/%s" % (host,selector,fileName))
+    request.add_header('X-Adaptive-AuthToken', adaptive_data.token)
     request.get_method = lambda: 'DELETE'
 
     try:
@@ -122,9 +133,11 @@ def readProjectFile(fileName):
 
     cookies = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandler) #zwraca OpenerDirector
+    request = urllib2.Request("http://%s/%s/%s" % (host,selector,fileName))
+    request.add_header('X-Adaptive-AuthToken', adaptive_data.token)
 
     try:
-        f = opener.open("http://%s/%s/%s?token=%s" % (host,selector,fileName,adaptive_data.token))
+        f = opener.open(request)
     except:
         return ( False, None )
     return (True, f.read())
