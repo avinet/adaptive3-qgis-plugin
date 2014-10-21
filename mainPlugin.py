@@ -56,14 +56,15 @@ class AdaptivePlugin():
 
     def runProjects(self):
         resp = ""
-        ok = False
+        authOk = False
+        operationOk = False
         askForCredentials = True
-        while not ok and askForCredentials:
+        while not authOk and askForCredentials:
             if adaptive_data.token:
                 QApplication.setOverrideCursor(Qt.WaitCursor)
-                ok,resp = listProjectFiles()
+                authOk,operationOk,resp = listProjectFiles()
                 QApplication.restoreOverrideCursor()
-            if not ok:
+            if not authOk:
                 dlg = EnterPasswordDialog(self.iface.mainWindow())
                 dlg.label_3.setText(u"Please provide your Adaptive username and password")
                 dlg.labelError.hide()
@@ -78,8 +79,10 @@ class AdaptivePlugin():
                 else:
                     #zaniechano
                     askForCredentials = False
-        if not ok:
-            QMessageBox.critical(self.iface.mainWindow(), u"Adaptive: Error", u"Unable to read project list")
+            else:
+                askForCredentials = False
+        if not operationOk:
+            QMessageBox.critical(self.iface.mainWindow(), resp)
             return
         if not len(resp):
             QMessageBox.information(self.iface.mainWindow(), u"Adaptive: Error", u"No projects published.")
@@ -94,20 +97,21 @@ class AdaptivePlugin():
         filePath = proj.fileName()
         fileName = QFileInfo(filePath).fileName()
 
-        (ok, result) = validateProject(self.iface, filePath)
-        if not ok:
+        (operationOk, result) = validateProject(self.iface, filePath)
+        if not operationOk:
             QMessageBox.critical(self.iface.mainWindow(), u'Error!', result)
             return
 
         result = ""
-        ok = False
+        authOk = False
+        operationOk = False
         askForCredentials = True
-        while not ok and askForCredentials:
+        while not authOk and askForCredentials:
             if adaptive_data.token:
                 QApplication.setOverrideCursor(Qt.WaitCursor)
-                (ok,result) = uploadProjectFile(self.iface, filePath)
+                (authOk,operationOk,result) = uploadProjectFile(self.iface, filePath)
                 QApplication.restoreOverrideCursor()
-            if not ok:
+            if not authOk:
                 dlg = EnterPasswordDialog(self.iface.mainWindow())
                 dlg.label_3.setText(u"Please provide your Adaptive username and password")
                 dlg.labelError.hide()
@@ -122,8 +126,10 @@ class AdaptivePlugin():
                 else:
                     #zaniechano
                     askForCredentials = False
+            else:
+                askForCredentials = False
 
-        if not ok:
+        if not operationOk:
             QMessageBox.critical(self.iface.mainWindow(), u'Error!', result)
             return
 

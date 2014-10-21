@@ -49,15 +49,16 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
         fileName = self.treeProjects.selectedItems()[0].text(0)
         if QMessageBox.question(self, "Adaptive", u"Are you sure you want to remove service %s?\nOperation can not be reversed!" % fileName, QMessageBox.Yes, QMessageBox.No) == QMessageBox.Yes:
 
-            result = ""
-            ok = False
+            errorMessage = ""
+            operationOk = False
+            authOk = False
             askForCredentials = True
-            while not ok and askForCredentials:
+            while not authOk and askForCredentials:
                 if adaptive_data.token:
                     QApplication.setOverrideCursor(Qt.WaitCursor)
-                    ok,result = deleteProjectFile(unicode(fileName))
+                    authOk,operationOk,errorMessage = deleteProjectFile(unicode(fileName))
                     QApplication.restoreOverrideCursor()
-                if not ok:
+                if not authOk:
                     dlg = EnterPasswordDialog(self.iface.mainWindow())
                     dlg.label_3.setText(u"Please provide your Adaptive username and password")
                     dlg.labelError.hide()
@@ -71,11 +72,13 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
                         adaptive_data.token = authenticate(adaptive_data.token_username, adaptive_data.token_password)
                     else:
                         askForCredentials = False
-            if not ok:
-                QMessageBox.critical(self, u'Error!', u'Unable to write data to Adaptive')
+                else:
+                    askForCredentials = False
+            if not operationOk:
+                QMessageBox.critical(self, u'Error!', errorMessage)
                 return
-            ok,resp = listProjectFiles()
-            if ok:
+            authOk,operationOk,resp = listProjectFiles()
+            if authOk and operationOk:
                 self.projects = resp
             self.fillTree()
 
@@ -86,15 +89,16 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
             return
         fileName = self.treeProjects.selectedItems()[0].text(0)
 
-        xml = ""
-        ok = False
+        xmlOrError = ""
+        authOk = False
+        operationOk = False
         askForCredentials = True
-        while not ok and askForCredentials:
+        while not authOk and askForCredentials:
             if adaptive_data.token:
                 QApplication.setOverrideCursor(Qt.WaitCursor)
-                ok, xml = readProjectFile(unicode(fileName))
+                authOk, operationOk, xmlOrError = readProjectFile(unicode(fileName))
                 QApplication.restoreOverrideCursor()
-            if not ok:
+            if not authOk:
                 dlg = EnterPasswordDialog(self.iface.mainWindow())
                 dlg.label_3.setText(u"Please provide you Adaptive username and password")
                 dlg.labelError.hide()
@@ -108,13 +112,15 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
                     adaptive_data.token = authenticate(adaptive_data.token_username, adaptive_data.token_password)
                 else:
                     askForCredentials = False
-        if not ok:
-            QMessageBox.critical(self, u'Error!', u'Unable to read data from Adaptive')
+            else:
+                askForCredentials = False
+        if not operationOk:
+            QMessageBox.critical(self, u'Error!', xmlOrError)
             return
         QApplication.setOverrideCursor(Qt.WaitCursor)
         projectFile = QFile( QDir.tempPath()+'/'+fileName )
         projectFile.open(QIODevice.ReadWrite)
-        projectFile.write(xml)
+        projectFile.write(xmlOrError)
         projectFile.close()
         proj = QgsProject.instance()
         proj.read(QFileInfo(projectFile.fileName()))

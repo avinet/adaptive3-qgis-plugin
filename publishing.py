@@ -66,7 +66,7 @@ def authenticate(username, password):
 def uploadProjectFile(iface, filePath):
     ''' Uploaduj plik projektu na serwer
         params: QgsInterface instancja interfejsu QGIS-a, unicode ścieżka do pliku projektu
-        returns: bool wynik (True gdy ok), unicode komunikat błędu
+        returns: bool AuthenticationOk, bool OperationOk, unicode file path (if ok) or error message (if not ok)
     '''
 
     fileName = QFileInfo(filePath).fileName()
@@ -83,15 +83,21 @@ def uploadProjectFile(iface, filePath):
 
     try:
         opener.open(request)
+    except urllib2.HTTPError, e:
+        if e.code == 401:
+            return ( False, False, None )
+        else:
+            result = json.loads(e.read())
+            return ( True, False, unicode(result['Message']) )
     except:
-        return ( False, u'Error while writing data to Adaptive!' )
-    return (True, '%s' % (fileName))
+        return ( False, False, u'Error while writing data to Adaptive!' )
+    return (True, True, '%s' % (fileName))
 
 
 def listProjectFiles():
     ''' Listuj pliki projektów na serwerze
         params:
-        returns: bool wynik (True gdy ok), list of dicts: konfiguracja projektów
+        returns: bool AuthenticationOk, bool OperationOk, list of dicts: projects information (if ok) or error message (if not ok)
     '''
 
     cookies = cookielib.CookieJar()
@@ -101,16 +107,22 @@ def listProjectFiles():
 
     try:
         f = opener.open(request)
-    except e:
+    except urllib2.HTTPError, e:
+        if e.code == 401:
+            return ( False, False, None )
+        else:
+            result = json.loads(e.read())
+            return ( True, False, unicode(result['Message']) )
+    except:
+        return ( False, False, u'Error while reading data from Adaptive!' )
 
-        return ( False, None )
-    return (True, json.loads(f.read()))
+    return (True, True, json.loads(f.read()))
 
 
 def deleteProjectFile(fileName):
     ''' usuń plik projektu z serwera
         params: unicode nazwa pliku projektu
-        returns: bool wynik (True gdy ok), unicode komunikat błędu (akurat w tej funkcji zawsze None)
+        returns: bool AuthenticationOk, bool OperationOk, unicode error message
     '''
 
     opener = urllib2.build_opener(urllib2.HTTPHandler)
@@ -119,16 +131,23 @@ def deleteProjectFile(fileName):
     request.get_method = lambda: 'DELETE'
 
     try:
-        opener.open(request)
+        f = opener.open(request)
+    except urllib2.HTTPError, e:
+        if e.code == 401:
+            return ( False, False, None )
+        else:
+            result = json.loads(e.read())
+            return ( True, False, unicode(result['Message']) )
     except:
-        return ( False, None )
-    return ( True, None )
+        return ( False, False, None )
+    return ( True, True, None )
 
 
 def readProjectFile(fileName):
     ''' czytaj plik projektu z serwera
         params: unicode nazwa pliku projektu
         returns: bool wynik (True gdy ok), unicode treść pliku projektu
+        returns: bool AuthenticationOk, bool OperationOk, unicode file content (if ok) or error message (if not ok)
     '''
 
     cookies = cookielib.CookieJar()
@@ -138,6 +157,12 @@ def readProjectFile(fileName):
 
     try:
         f = opener.open(request)
+    except urllib2.HTTPError, e:
+        if e.code == 401:
+            return ( False, False, None )
+        else:
+            result = json.loads(e.read())
+            return ( True, False, unicode(result['Message']) )
     except:
-        return ( False, None )
-    return (True, f.read())
+        return ( False, False, u'Error while reading data from Adaptive!' )
+    return (True, True, f.read())
