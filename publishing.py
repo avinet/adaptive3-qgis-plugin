@@ -13,7 +13,7 @@ from multipartposthandler import MultipartPostHandler
 
 # Configuration: PluginService hostname and port number. No trailing slash or protocol scheme.
 # Example: 'pluginservice.utvikling.avinet.no'
-host = 'localhost:8080'
+host = 'localhost'
 # Configuration: PluginService relative path, without trailing or leading slash.
 # Example (for pluginservice as separate site): 'api/qgis'
 selector = 'a_a3_pluginservice/api/qgis'
