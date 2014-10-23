@@ -11,7 +11,7 @@ from dlgEnterPassword import EnterPasswordDialog
 from dlgProjects import ProjectsDialog
 
 from publishing import host, authenticate, validateProject, uploadProjectFile, listProjectFiles
-
+from qgis.core import *
 
 
 class AdaptivePlugin():
