@@ -71,7 +71,9 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
                         adaptive_data.token_password = dlg.linePass.text()
                         adaptive_data.token = authenticate(adaptive_data.token_username, adaptive_data.token_password)
                     else:
-                        askForCredentials = False
+                        #user cancelled authentication
+                        QMessageBox.information(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u"Adaptive information"), QCoreApplication.translate('AdaptivePlugin', u"Authentication is required in order to use Adaptive plugin."))
+                        return
                 else:
                     askForCredentials = False
             if not operationOk:
@@ -111,7 +113,9 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
                     adaptive_data.token_password = dlg.linePass.text()
                     adaptive_data.token = authenticate(adaptive_data.token_username, adaptive_data.token_password)
                 else:
-                    askForCredentials = False
+                    #user cancelled authentication
+                    QMessageBox.information(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u"Adaptive information"), QCoreApplication.translate('AdaptivePlugin', u"Authentication is required in order to use Adaptive plugin."))
+                    return
             else:
                 askForCredentials = False
         if not operationOk:
