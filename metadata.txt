@@ -5,11 +5,11 @@ qgisMinimumVersion=2.0
 description=Tool for easy publishing QGIS Projects to Adaptive
 version=2.2
 
-homepage=http://gridw.pl
+homepage=http://avinet.no
 icon=about.png
 experimental=False
 deprecated=False
 
 # Author contact information
 author=Borys Jurgiel, Maciej Świętochowski
-email=grid@gridw.pl
+email=support@avinet.no
