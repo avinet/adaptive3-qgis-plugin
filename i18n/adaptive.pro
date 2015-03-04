@@ -1,5 +1,6 @@
 FORMS = ../dlgEnterPasswordBase.ui \
-../dlgProjectsBase.ui
+../dlgProjectsBase.ui \
+    ../dlgSetting.ui
 
 SOURCES = ../dlgProjects.py \
 ../mainPlugin.py \

@@ -3,26 +3,35 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from qgis.core import *
-
+from PyQt4.QtCore import QSettings
 import adaptive_data
 
 import json
 import urllib2, cookielib
 from multipartposthandler import MultipartPostHandler
 
+settings = QSettings()
+
+if not settings.contains('a3_host'):
+    settings.setValue('a3_host', '')
+
+if not settings.contains('a3_selector'):
+    settings.setValue('a3_selector', '')
 
 # Configuration: PluginService hostname and port number. No trailing slash or protocol scheme.
 # Example: 'pluginservice.utvikling.avinet.no'
-host = 'localhost'
+host = settings.value('a3_host', type=str)
 # Configuration: PluginService relative path, without trailing or leading slash.
 # Example (for pluginservice as separate site): 'api/qgis'
-selector = 'a_a3_pluginservice/api/qgis'
+selector = settings.value('a3_selector', type=str)
 
 def validateProject(iface, filePath):
     ''' Validates if the project file meets Adaptive's requirements
         params: QgsInterface QGIS interface instance, unicode project file path
         returns: bool projectOk, unicode error message
     '''
+    host = settings.value('a3_host', type=str)
+    selector = settings.value('a3_selector', type=str)
 
     if not len(iface.mapCanvas().layers()):
         return ( False, QCoreApplication.translate('publishing', u'There are no layers in this project.') )
@@ -44,6 +53,8 @@ def authenticate(username, password):
         params: string username, string password
         returns: string token
     '''
+    host = settings.value('a3_host', type=str)
+    selector = settings.value('a3_selector', type=str)
 
     cookies = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandler) #zwraca OpenerDirector
@@ -64,6 +75,8 @@ def uploadProjectFile(iface, filePath):
         params: QgsInterface QGIS interface instance, unicode project file path
         returns: bool AuthenticationOk, bool OperationOk, unicode file path (if ok) or error message (if not ok)
     '''
+    host = settings.value('a3_host', type=str)
+    selector = settings.value('a3_selector', type=str)
 
     fileName = QFileInfo(filePath).fileName()
     fileName = unicode(fileName) # for compatibility with post_multipart
@@ -95,6 +108,8 @@ def listProjectFiles():
         params:
         returns: bool AuthenticationOk, bool OperationOk, list of dicts: projects information (if ok) or error message (if not ok)
     '''
+    host = settings.value('a3_host', type=str)
+    selector = settings.value('a3_selector', type=str)
 
     cookies = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandler) #zwraca OpenerDirector
@@ -120,6 +135,8 @@ def deleteProjectFile(fileName):
         params: unicode project file name
         returns: bool AuthenticationOk, bool OperationOk, unicode error message
     '''
+    host = settings.value('a3_host', type=str)
+    selector = settings.value('a3_selector', type=str)
 
     opener = urllib2.build_opener(urllib2.HTTPHandler)
     request = urllib2.Request("http://%s/%s/%s" % (host,selector,fileName))
@@ -144,6 +161,8 @@ def readProjectFile(fileName):
         params: unicode project file name
         returns: bool AuthenticationOk, bool OperationOk, unicode file content (if ok) or error message (if not ok)
     '''
+    host = settings.value('a3_host', type=str)
+    selector = settings.value('a3_selector', type=str)
 
     cookies = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandler) #zwraca OpenerDirector
