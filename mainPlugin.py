@@ -9,8 +9,9 @@ from resources_rc import *
 
 from dlgEnterPassword import EnterPasswordDialog
 from dlgProjects import ProjectsDialog
+from dlgSetting import SettingDialog
 
-from publishing import host, authenticate, validateProject, uploadProjectFile, listProjectFiles
+from publishing import authenticate, validateProject, uploadProjectFile, listProjectFiles
 from qgis.core import *
 
 
@@ -34,12 +35,14 @@ class AdaptivePlugin():
     def initGui(self):
         self.action1 = QAction(QIcon(), QCoreApplication.translate('AdaptivePlugin', u'Projects'), self.iface.mainWindow())
         self.action2 = QAction(QIcon(), QCoreApplication.translate('AdaptivePlugin', u'Publish project'), self.iface.mainWindow())
-
+        self.action3 = QAction(QIcon(), QCoreApplication.translate('AdaptivePlugin', u'Settings'), self.iface.mainWindow())
+        
         self.action1.setToolTip(QCoreApplication.translate('AdaptivePlugin', u'Adaptive: Browse QGIS project on server'))
         self.action2.setToolTip(QCoreApplication.translate('AdaptivePlugin', u'Adaptive: Publish QGIS project to server'))
 
         self.action1.triggered.connect(self.runProjects)
         self.action2.triggered.connect(self.runPublish)
+        self.action3.triggered.connect(self.runSettings)
 
         self.toolBar = self.iface.addToolBar(QCoreApplication.translate('AdaptivePlugin', "Adaptive"))
         self.toolBar.setObjectName('Adaptive')
@@ -50,7 +53,7 @@ class AdaptivePlugin():
         lastAction = menuBar.actions()[len(menuBar.actions()) - 1]
         menuBar.insertMenu(lastAction, self.menu)
 
-        for i in [self.action1, self.action2]:
+        for i in [self.action1, self.action2, self.action3]:
             self.menu.addAction(i)
             self.toolBar.addAction(i)
 
@@ -148,3 +151,7 @@ class AdaptivePlugin():
             return
 
         QMessageBox.information(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Adaptive'), QCoreApplication.translate('AdaptivePlugin', u'Project has been published in Adaptive. You can now create a new Theme based on QGIS Project <b>%s</b>.') % result)
+    
+    def runSettings(self):
+        dialog = SettingDialog(self.iface)
+        dialog.exec_()
