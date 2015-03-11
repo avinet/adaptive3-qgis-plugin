@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt4.QtGui import *
-from PyQt4.QtCore import QSettings
+from PyQt4.QtCore import *
 from dlgSettingBase import Ui_Dialog
 import urllib
 import urllib2
@@ -37,7 +37,13 @@ class SettingDialog(QDialog, Ui_Dialog):
     req = urllib2.Request(url)
     req.add_header('Content-Type','application/json')
     data = json.dumps(postdata)
-    response = urllib2.urlopen(req,data)
+    
+    response = None
+    try:
+        response = urllib2.urlopen(req,data)
+    except:
+        QMessageBox.critical(self, QCoreApplication.translate('AdaptivePlugin', u"Error!"), QCoreApplication.translate('AdaptivePlugin', u"Couldn't connect to Adaptive backend"))
+        return
     jsonResponse =  json.load(response)
     plugin_path =  jsonResponse['d']['data'][0]['value']
     
