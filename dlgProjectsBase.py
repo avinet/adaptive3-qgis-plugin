@@ -41,7 +41,9 @@ class Ui_ProjectsDialog(object):
         self.treeProjects.setRootIsDecorated(False)
         self.treeProjects.setItemsExpandable(False)
         self.treeProjects.setObjectName(_fromUtf8("treeProjects"))
-        self.treeProjects.header().setVisible(False)
+        header=QtGui.QTreeWidgetItem(["A3 project name", "QGis file name"])
+        self.treeProjects.setHeaderItem(header)
+        self.treeProjects.setColumnCount(2)
         self.gridLayout.addWidget(self.treeProjects, 0, 0, 1, 4)
         self.buttonRemove = QtGui.QPushButton(ProjectsDialog)
         self.buttonRemove.setObjectName(_fromUtf8("buttonRemove"))
@@ -70,7 +72,6 @@ class Ui_ProjectsDialog(object):
 
     def retranslateUi(self, ProjectsDialog):
         ProjectsDialog.setWindowTitle(_translate("ProjectsDialog", "Adaptive services", None))
-        self.treeProjects.headerItem().setText(0, _translate("ProjectsDialog", "file", None))
         self.buttonRemove.setText(_translate("ProjectsDialog", "Delete", None))
         self.buttonLoad.setText(_translate("ProjectsDialog", "Load", None))
 

@@ -6,6 +6,7 @@ from qgis.core import *
 from dlgProjectsBase import Ui_ProjectsDialog
 from dlgEnterPassword import EnterPasswordDialog
 import adaptive_data
+import adaptiveUtils
 from adaptive_data import *
 from publishing import authenticate, listProjectFiles, deleteProjectFile, readProjectFile
 
@@ -31,10 +32,9 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
         self.treeProjects.clear()
         for project in self.projects:
                 item = QTreeWidgetItem(self.treeProjects)
-                item.setText(0, project['fileName'] )
-        self.treeProjects.resizeColumnToContents(0)
-
-
+                item.object = project
+                item.setText(0, project['name'])
+                item.setText(1, project['filename'])
 
     def selectionChanged(self):
         isSelection = bool(self.treeProjects.selectedItems())
@@ -47,6 +47,7 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
         if not bool(self.treeProjects.selectedItems()):
             return
         fileName = self.treeProjects.selectedItems()[0].text(0)
+        fileUuid = self.treeProjects.selectedItems()[0].object["uuid"]
         if QMessageBox.question(self, self.tr("Adaptive"), self.tr(u"Are you sure you want to remove service %s?\nOperation can not be reversed!") % fileName, QMessageBox.Yes, QMessageBox.No) == QMessageBox.Yes:
 
             errorMessage = ""
@@ -56,24 +57,10 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
             while not authOk and askForCredentials:
                 if adaptive_data.token:
                     QApplication.setOverrideCursor(Qt.WaitCursor)
-                    authOk,operationOk,errorMessage = deleteProjectFile(unicode(fileName))
+                    authOk,operationOk,errorMessage = deleteProjectFile(unicode(fileUuid))
                     QApplication.restoreOverrideCursor()
                 if not authOk:
-                    dlg = EnterPasswordDialog(self.iface.mainWindow())
-                    dlg.label_3.setText(self.tr(u"Please provide your Adaptive username and password"))
-                    dlg.labelError.hide()
-                    dlg.lineUser.setText(adaptive_data.token_username)
-                    dlg.linePass.setText(adaptive_data.token_password)
-                    if adaptive_data.token_username: dlg.linePass.setFocus()
-                    dlg.exec_()
-                    if dlg.result():
-                        adaptive_data.token_username = dlg.lineUser.text()
-                        adaptive_data.token_password = dlg.linePass.text()
-                        adaptive_data.token = authenticate(adaptive_data.token_username, adaptive_data.token_password)
-                    else:
-                        #user cancelled authentication
-                        QMessageBox.information(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u"Adaptive information"), QCoreApplication.translate('AdaptivePlugin', u"Authentication is required in order to use Adaptive plugin."))
-                        return
+                    askForCredentials = adaptiveUtils.authenticateUser(self)
                 else:
                     askForCredentials = False
             if not operationOk:
@@ -89,7 +76,8 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
     def loadProject(self):
         if not bool(self.treeProjects.selectedItems()):
             return
-        fileName = self.treeProjects.selectedItems()[0].text(0)
+        fileName = self.treeProjects.selectedItems()[0].object["filename"]
+        fileUuid = self.treeProjects.selectedItems()[0].object["uuid"]
 
         xmlOrError = ""
         authOk = False
@@ -98,36 +86,24 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
         while not authOk and askForCredentials:
             if adaptive_data.token:
                 QApplication.setOverrideCursor(Qt.WaitCursor)
-                authOk, operationOk, xmlOrError = readProjectFile(unicode(fileName))
+                authOk, operationOk, xmlOrError = readProjectFile(unicode(fileUuid))
                 QApplication.restoreOverrideCursor()
             if not authOk:
-                dlg = EnterPasswordDialog(self.iface.mainWindow())
-                dlg.label_3.setText(self.tr(u"Please provide you Adaptive username and password"))
-                dlg.labelError.hide()
-                dlg.lineUser.setText(adaptive_data.token_username)
-                dlg.linePass.setText(adaptive_data.token_password)
-                if adaptive_data.token_username: dlg.linePass.setFocus()
-                dlg.exec_()
-                if dlg.result():
-                    adaptive_data.token_username = dlg.lineUser.text()
-                    adaptive_data.token_password = dlg.linePass.text()
-                    adaptive_data.token = authenticate(adaptive_data.token_username, adaptive_data.token_password)
-                else:
-                    #user cancelled authentication
-                    QMessageBox.information(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u"Adaptive information"), QCoreApplication.translate('AdaptivePlugin', u"Authentication is required in order to use Adaptive plugin."))
-                    return
+                askForCredentials = adaptiveUtils.authenticateUser(self)
             else:
                 askForCredentials = False
         if not operationOk:
             QMessageBox.critical(self, self.tr(u'Error!'), xmlOrError)
             return
         QApplication.setOverrideCursor(Qt.WaitCursor)
+        QFile.remove(QDir.tempPath()+'/'+fileName)
         projectFile = QFile( QDir.tempPath()+'/'+fileName )
-        projectFile.open(QIODevice.ReadWrite)
+        projectFile.open(QIODevice.ReadWrite | QIODevice.Truncate)
         projectFile.write(xmlOrError)
+        projectFile.flush()
         projectFile.close()
         proj = QgsProject.instance()
+        proj.clear()
         proj.read(QFileInfo(projectFile.fileName()))
         QApplication.restoreOverrideCursor()
         self.close()
-

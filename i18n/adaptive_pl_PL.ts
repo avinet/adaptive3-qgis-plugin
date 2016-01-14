@@ -12,6 +12,11 @@
         <source>Publish project</source>
         <translation type="unfinished"></translation>
     </message>
+	<message>
+        <location filename="../mainPlugin.py" line="36"/>
+        <source>Update project</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <location filename="../mainPlugin.py" line="38"/>
         <source>Adaptive: Browse QGIS project on server</source>
