@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from PyQt4.QtXml import QDomDocument
 from qgis.core import *
 from dlgProjectsBase import Ui_ProjectsDialog
-from dlgEnterPassword import EnterPasswordDialog
 import adaptive_data
 import adaptiveUtils
-from adaptive_data import *
-from publishing import authenticate, listProjectFiles, deleteProjectFile, readProjectFile
+from publishing import listProjectFiles, deleteProjectFile, readProjectFile
 
 #----------------------------------------------------------------------------
 

@@ -63,29 +63,28 @@ class AdaptivePlugin():
             self.iface.removePluginMenu(QCoreApplication.translate('AdaptivePlugin', 'Adaptive'), i)
 
     def runProjects(self):
-        resp = ""
-        authOk = False
-        operationOk = False
-        askForCredentials = True
-        while not authOk and askForCredentials:
+
+        while True:
             if adaptive_data.token:
                 QApplication.setOverrideCursor(Qt.WaitCursor)
                 authOk,operationOk,resp = listProjectFiles()
                 QApplication.restoreOverrideCursor()
-            if not authOk:
-                askForCredentials = adaptiveUtils.authenticateUser(self)
-            else:
-                askForCredentials = False
-        if not operationOk:
-            if not len(resp):
-                resp = QCoreApplication.translate('AdaptivePlugin', u"Authentication failed")
-            QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u"Adaptive: Error"), resp)
-            return
-        if not len(resp):
-            QMessageBox.information(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u"Adaptive: Error"), QCoreApplication.translate('AdaptivePlugin', u"No projects published."))
-            return
-        dialog = ProjectsDialog(self.iface, resp)
-        dialog.exec_()
+
+                if not authOk:
+                    adaptive_data.token = None
+                    continue
+
+                if operationOk:
+                    dialog = ProjectsDialog(self.iface, resp)
+                    dialog.exec_()
+                    if not dialog.result():
+                        break
+
+                else:
+                    QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u"Adaptive: Error"), resp)
+
+            elif not adaptiveUtils.authenticateUser(self):
+                break
 
     def runPublish(self):
         proj = QgsProject.instance()
@@ -96,32 +95,26 @@ class AdaptivePlugin():
             QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), result)
             return
 
-        result = ""
-        authOk = False
-        operationOk = False
-        askForCredentials = True
-        while not authOk and askForCredentials:
+        while True:
             if adaptive_data.token:
                 dlg = NewProjectDialog(self.iface.mainWindow())
                 dlg.exec_()
-                if dlg.result():
-                    fileName = dlg.lineProjectName.text()
-                    QApplication.setOverrideCursor(Qt.WaitCursor)
-                    (authOk,operationOk,result) = uploadProjectFile(self.iface, filePath, fileName)
-                    QApplication.restoreOverrideCursor()
-                else:
-                    operationOk = True
+                if not dlg.result():
                     break
-            if not authOk:
-                askForCredentials = adaptiveUtils.authenticateUser(self)
-            else:
-                askForCredentials = False
-
-        if not operationOk:
-            QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), result)
-            return
-
-        QMessageBox.information(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Adaptive'), QCoreApplication.translate('AdaptivePlugin', u'Project has been published in Adaptive. You can now create a new Theme based on QGIS Project <b>%s</b>.') % result)
+                fileName = dlg.lineProjectName.text()
+                QApplication.setOverrideCursor(Qt.WaitCursor)
+                (authOk,operationOk,result) = uploadProjectFile(self.iface, filePath, fileName)
+                QApplication.restoreOverrideCursor()
+                if not authOk:
+                    adaptive_data.token = None
+                    continue
+                if operationOk:
+                    QMessageBox.information(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Adaptive'), QCoreApplication.translate('AdaptivePlugin', u'Project has been published in Adaptive. You can now create a new Theme based on QGIS Project <b>%s</b>.') % result)
+                else:
+                    QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), result)
+                break
+            elif not adaptiveUtils.authenticateUser(self):
+                break
 
     def runUpdate(self):
         proj = QgsProject.instance()
@@ -132,29 +125,32 @@ class AdaptivePlugin():
             QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), result)
             return
 
-        result = ""
-        authOk = False
-        operationOk = False
-        askForCredentials = True
-        while not authOk and askForCredentials:
+        while True:
             if adaptive_data.token:
                 # Load current projects
                 authOk,operationOk,result = listProjectFiles()
-                dlg = UpdateProjectDialog(self.iface.mainWindow(), result)
-                dlg.exec_()
-                if dlg.result():
+                if not authOk:
+                    adaptive_data.token = None
+                    continue
+                if operationOk:
+                    dlg = UpdateProjectDialog(self.iface.mainWindow(), result)
+                    dlg.exec_()
+                    if not dlg.result():
+                        break
                     QApplication.setOverrideCursor(Qt.WaitCursor)
                     (authOk,operationOk,result) = uploadProjectFile(self.iface, filePath, dlg.project['name'], dlg.project['uuid'])
                     QApplication.restoreOverrideCursor()
-            if not authOk:
-                askForCredentials = adaptiveUtils.authenticateUser(self)
-            else:
-                askForCredentials = False
-        if not operationOk:
-            QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), result)
-            return
-
-        QMessageBox.information(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Adaptive'), QCoreApplication.translate('AdaptivePlugin', u'Project <b>%s</b> has been updated.') % result)
+                    if not authOk:
+                        adaptive_data.token = None
+                        continue
+                    if operationOk:
+                        QMessageBox.information(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Adaptive'), QCoreApplication.translate('AdaptivePlugin', u'Project <b>%s</b> has been updated.') % result)
+                    else:
+                        QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), result)
+                else:
+                    QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), result)
+            elif not adaptiveUtils.authenticateUser(self):
+                break
 
     def runSettings(self):
         dialog = SettingDialog(self.iface)

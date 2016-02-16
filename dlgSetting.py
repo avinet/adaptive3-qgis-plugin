@@ -2,10 +2,7 @@
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 from dlgSettingBase import Ui_Dialog
-import urllib
-import urllib2
-import json
-from urlparse import urlparse
+
 
 class SettingDialog(QDialog, Ui_Dialog):
   def __init__(self, parent):
@@ -16,8 +13,7 @@ class SettingDialog(QDialog, Ui_Dialog):
     
   def saveSettings(self):
     settings = QSettings()
-    settings.setValue('a3_url', self.lineEdit.text());
-    #self.loadSetup()
+    settings.setValue('a3_url', self.lineEdit.text())
     
   def loadSettings(self):
     settings = QSettings()

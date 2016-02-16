@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'dlgUpdateProject.ui'
 #
-# Created: Fri Feb 05 12:05:34 2016
+# Created: Fri Apr 01 12:27:32 2016
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -45,5 +45,5 @@ class Ui_UpdateProjectDialogBase(object):
         QtCore.QMetaObject.connectSlotsByName(UpdateProjectDialogBase)
 
     def retranslateUi(self, UpdateProjectDialogBase):
-        UpdateProjectDialogBase.setWindowTitle(_translate("UpdateProjectDialogBase", "Dialog", None))
+        UpdateProjectDialogBase.setWindowTitle(_translate("UpdateProjectDialogBase", "Update project", None))
 

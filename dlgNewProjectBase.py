@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'dlgNewProject.ui'
 #
-# Created: Thu Jan 14 15:19:31 2016
+# Created: Fri Apr 01 12:27:36 2016
 #      by: PyQt4 UI code generator 4.10.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -50,6 +50,6 @@ class Ui_NewProjectDialogBase(object):
         QtCore.QMetaObject.connectSlotsByName(NewProjectDialogBase)
 
     def retranslateUi(self, NewProjectDialogBase):
-        NewProjectDialogBase.setWindowTitle(_translate("NewProjectDialogBase", "Dialog", None))
+        NewProjectDialogBase.setWindowTitle(_translate("NewProjectDialogBase", "New project", None))
         self.labelProjectName.setText(_translate("NewProjectDialogBase", "Project name", None))
 
