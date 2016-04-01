@@ -213,7 +213,7 @@ def readProjectFile(fileUuid):
     '''
 
     try:
-        f = urllib2.urlopen("{}/WebServices/administrator/modules/qgis/Downloader.ashx?uuid={}".format(host, fileUuid))
+        f = urllib2.urlopen("{}/WebServices/administrator/modules/qgis/Downloader.ashx?gm_session_id={}&uuid={}".format(host, adaptive_data.token, fileUuid))
         return (True, True, f.read())
     except urllib2.HTTPError, e:
         if e.code == 401:
@@ -239,6 +239,7 @@ def uploadFile(filePath):
                "file" : open(filePath, "rb") }
 
     request = urllib2.Request("{}/WebServices/administrator/modules/qgis/Uploader.ashx".format(host), params)
+    request.add_header('gm_session_id', adaptive_data.token)
 
     try:
         f = opener.open(request)
