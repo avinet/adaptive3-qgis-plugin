@@ -10,28 +10,23 @@ import json
 import urllib2, cookielib
 from multipartposthandler import MultipartPostHandler
 
+import hashlib
+import sys, traceback
+
 settings = QSettings()
 
-if not settings.contains('a3_host'):
-    settings.setValue('a3_host', '')
+if not settings.contains('a3_url'):
+    settings.setValue('a3_url', '')
 
-if not settings.contains('a3_selector'):
-    settings.setValue('a3_selector', '')
+# Configuration: adaptive 3 url
+host = settings.value('a3_url', type=str)
 
-# Configuration: PluginService hostname and port number. No trailing slash or protocol scheme.
-# Example: 'pluginservice.utvikling.avinet.no'
-host = settings.value('a3_host', type=str)
-# Configuration: PluginService relative path, without trailing or leading slash.
-# Example (for pluginservice as separate site): 'api/qgis'
-selector = settings.value('a3_selector', type=str)
 
 def validateProject(iface, filePath):
     ''' Validates if the project file meets Adaptive's requirements
         params: QgsInterface QGIS interface instance, unicode project file path
         returns: bool projectOk, unicode error message
     '''
-    host = settings.value('a3_host', type=str)
-    selector = settings.value('a3_selector', type=str)
 
     if not len(iface.mapCanvas().layers()):
         return ( False, QCoreApplication.translate('publishing', u'There are no layers in this project.') )
@@ -53,30 +48,186 @@ def authenticate(username, password):
         params: string username, string password
         returns: string token
     '''
-    host = settings.value('a3_host', type=str)
-    selector = settings.value('a3_selector', type=str)
 
-    cookies = cookielib.CookieJar()
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandler) #zwraca OpenerDirector
+    params = { "email": username,
+               "pass": hashlib.sha512(password).hexdigest() }
 
-    params = { "username": username,
-               "password": password }
+    req = urllib2.Request('{}/WebServices/generic/Authentication.asmx/Authenticate'.format(host))
+    req.add_header('Content-Type', 'application/json')
 
     try:
-        f = opener.open("http://%s/%s/authenticate" % (host,selector), params)
+        f = urllib2.urlopen(req, json.dumps(params))
         result = json.loads(f.read())
-        return result["Token"]
+        result = result["d"]
+
+        if not result["success"]:
+            return ""
+
+        for d in result["data"]:
+            if d["key"] == "gm_session_id":
+                return str(d["value"])
+            else:
+                return ""
     except:
         return ""
 
 
-def uploadProjectFile(iface, filePath):
+def uploadProjectFile(iface, filePath, projectName, uuid = None):
     ''' Uploads project file to the Adaptive service
         params: QgsInterface QGIS interface instance, unicode project file path
         returns: bool AuthenticationOk, bool OperationOk, unicode file path (if ok) or error message (if not ok)
     '''
-    host = settings.value('a3_host', type=str)
-    selector = settings.value('a3_selector', type=str)
+
+    success, result = uploadFile(filePath)
+
+    if success:
+
+        fileName = result["fileNames"][0]
+
+        if uuid:
+            return updateQgisProject(uuid, fileName, projectName)
+        else:
+            return createQgisProject(result["originalFileNames"][0], fileName, projectName)
+    else:
+        return ( False, False, QCoreApplication.translate('publishing', u'Error while writing data to Adaptive!') )
+
+def createQgisProject(name, filename, projectName):
+
+    params = {
+            "name":projectName,
+            "filename":name,
+            "projectfile":filename
+    }
+
+    req = urllib2.Request('{}/WebServices/administrator/modules/qgis/QgisProject.asmx/ExternalCreate'.format(host))
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('gm_session_id', adaptive_data.token)
+    req.add_header('gm_lang_code', 'nb')
+
+    try:
+        f = urllib2.urlopen(req, json.dumps(params))
+        result = json.loads(f.read())
+        result = result["d"]
+
+        if not result["success"]:
+            return ( True, False, formatExceptions(result))
+
+        return (True, True, '%s' % (projectName))
+
+
+
+    except urllib2.HTTPError, e:
+        if e.code == 401:
+            return ( False, False, None )
+        else:
+            result = json.loads(e.read())
+            return ( True, False, unicode(result['Message']) )
+    except:
+        return ( False, False, None )
+
+def updateQgisProject(uuid, projectfile, projectName):
+    params = {
+            "uuid":uuid,
+            "projectfile":projectfile
+    }
+
+    req = urllib2.Request('{}/WebServices/administrator/modules/qgis/QgisProject.asmx/UpdateExternal'.format(host))
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('gm_session_id', adaptive_data.token)
+    req.add_header('gm_lang_code', 'nb')
+
+    try:
+        f = urllib2.urlopen(req, json.dumps(params))
+        result = json.loads(f.read())
+        result = result["d"]
+
+        if not result["success"]:
+            return ( True, False, formatExceptions(result))
+
+        return ( True,True,'%s' % (projectName) )
+
+    except:
+        return ( True, False, None)
+
+
+def listProjectFiles():
+    ''' Lists project files in the Adaptive service
+        params:
+        returns: bool AuthenticationOk, bool OperationOk, list of dicts: projects information (if ok) or error message (if not ok)
+    '''
+
+    req = urllib2.Request('{}/WebServices/administrator/modules/qgis/QgisProject.asmx/ReadExternal'.format(host))
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('gm_lang_code', 'nb')
+    req.add_header('gm_session_id', adaptive_data.token)
+
+    try:
+        f = urllib2.urlopen(req, json.dumps({}))
+        result = json.loads(f.read())
+        result = result["d"]
+        if not result["success"]:
+            return ( False, False, QCoreApplication.translate('publishing', u'Error while reading data from Adaptive!') )
+
+        return (True, True, result["records"])
+
+    except:
+        return ( False, False, QCoreApplication.translate('publishing', u'Error while reading data from Adaptive!') )
+
+
+def deleteProjectFile(fileUuid):
+    ''' Deletes a project file from the Adaptive service
+        params: unicode project file name
+        returns: bool AuthenticationOk, bool OperationOk, unicode error message
+    '''
+
+    params = {
+        "uuids":[fileUuid],"extraParams":[]}
+
+    req = urllib2.Request('{}/WebServices/administrator/modules/qgis/QgisProject.asmx/Destroy'.format(host))
+    req.add_header('Content-Type', 'application/json')
+    req.add_header('gm_lang_code', 'nb')
+    req.add_header('gm_session_id', adaptive_data.token)
+
+    try:
+         f = urllib2.urlopen(req, json.dumps(params))
+         result = json.loads(f.read())
+         result = result["d"]
+
+         if not result["success"]:
+             return ( True, False, formatExceptions(result) )
+
+         return ( True, True, None )
+    except urllib2.HTTPError, e:
+        if e.code == 401:
+            return ( False, False, None )
+        else:
+            result = json.loads(e.read())
+            return ( True, False, unicode(result['Message']) )
+    except:
+        return ( False, False, None )
+
+def readProjectFile(fileUuid):
+    ''' Reads a project file from the Adaptive service
+        params: unicode project file name
+        returns: bool AuthenticationOk, bool OperationOk, unicode file content (if ok) or error message (if not ok)
+    '''
+
+    try:
+        f = urllib2.urlopen("{}/WebServices/administrator/modules/qgis/Downloader.ashx?uuid={}".format(host, fileUuid))
+        return (True, True, f.read())
+    except urllib2.HTTPError, e:
+        if e.code == 401:
+            return ( False, False, None )
+        else:
+            return ( True, False, "Error" )
+    except:
+        return ( False, False, QCoreApplication.translate('publishing', u'Error while reading data from Adaptive!') )
+
+def uploadFile(filePath):
+    ''' Uploads project file to the Adaptive service
+        params: QgsInterface QGIS interface instance, unicode project file path
+        returns: bool AuthenticationOk, bool OperationOk, unicode file path (if ok) or error message (if not ok)
+    '''
 
     fileName = QFileInfo(filePath).fileName()
     fileName = unicode(fileName) # for compatibility with post_multipart
@@ -87,96 +238,27 @@ def uploadProjectFile(iface, filePath):
     params = { "filename": fileName,
                "file" : open(filePath, "rb") }
 
-    request = urllib2.Request("http://%s/%s" % (host,selector), params)
-    request.add_header('X-Adaptive-AuthToken', adaptive_data.token)
-
-    try:
-        opener.open(request)
-    except urllib2.HTTPError, e:
-        if e.code == 401:
-            return ( False, False, None )
-        else:
-            result = json.loads(e.read())
-            return ( True, False, unicode(result['Message']) )
-    except:
-        return ( False, False, QCoreApplication.translate('publishing', u'Error while writing data to Adaptive!') )
-    return (True, True, '%s' % (fileName))
-
-
-def listProjectFiles():
-    ''' Lists project files in the Adaptive service
-        params:
-        returns: bool AuthenticationOk, bool OperationOk, list of dicts: projects information (if ok) or error message (if not ok)
-    '''
-    host = settings.value('a3_host', type=str)
-    selector = settings.value('a3_selector', type=str)
-
-    cookies = cookielib.CookieJar()
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandler) #zwraca OpenerDirector
-    request = urllib2.Request("http://%s/%s" % (host,selector))
-    request.add_header('X-Adaptive-AuthToken', adaptive_data.token)
+    request = urllib2.Request("{}/WebServices/administrator/modules/qgis/Uploader.ashx".format(host), params)
 
     try:
         f = opener.open(request)
-    except urllib2.HTTPError, e:
-        if e.code == 401:
-            return ( False, False, None )
+        result = json.loads(f.read())
+
+        if result["success"] == True:
+           return True, result
         else:
-            result = json.loads(e.read())
-            return ( True, False, unicode(result['Message']) )
-    except:
-        return ( False, False, QCoreApplication.translate('publishing', u'Error while reading data from Adaptive!') )
+            return False, None
 
-    return (True, True, json.loads(f.read()))
-
-
-def deleteProjectFile(fileName):
-    ''' Deletes a project file from the Adaptive service
-        params: unicode project file name
-        returns: bool AuthenticationOk, bool OperationOk, unicode error message
-    '''
-    host = settings.value('a3_host', type=str)
-    selector = settings.value('a3_selector', type=str)
-
-    opener = urllib2.build_opener(urllib2.HTTPHandler)
-    request = urllib2.Request("http://%s/%s/%s" % (host,selector,fileName))
-    request.add_header('X-Adaptive-AuthToken', adaptive_data.token)
-    request.get_method = lambda: 'DELETE'
-
-    try:
-        f = opener.open(request)
     except urllib2.HTTPError, e:
-        if e.code == 401:
-            return ( False, False, None )
-        else:
-            result = json.loads(e.read())
-            return ( True, False, unicode(result['Message']) )
-    except:
-        return ( False, False, None )
-    return ( True, True, None )
+        return False, None
 
+def formatExceptions(result):
 
-def readProjectFile(fileName):
-    ''' Reads a project file from the Adaptive service
-        params: unicode project file name
-        returns: bool AuthenticationOk, bool OperationOk, unicode file content (if ok) or error message (if not ok)
-    '''
-    host = settings.value('a3_host', type=str)
-    selector = settings.value('a3_selector', type=str)
+    if not result['exceptions']:
+        return None
 
-    cookies = cookielib.CookieJar()
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies), MultipartPostHandler) #zwraca OpenerDirector
-    request = urllib2.Request("http://%s/%s/%s" % (host,selector,fileName))
-    request.add_header('X-Adaptive-AuthToken', adaptive_data.token)
+    exceptions = result['exceptions']
 
-    try:
-        f = opener.open(request)
-    except urllib2.HTTPError, e:
-        if e.code == 401:
-            return ( False, False, None )
-        else:
-            result = json.loads(e.read())
-            return ( True, False, unicode(result['Message']) )
-    except:
-        return ( False, False, QCoreApplication.translate('publishing', u'Error while reading data from Adaptive!') )
-    return (True, True, f.read())
+    if hasattr(exceptions, '__len__') and (not isinstance(exceptions, str)):
+        if len(exceptions) > 0:
+            return exceptions[0]['msg']
