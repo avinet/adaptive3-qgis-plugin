@@ -14,6 +14,7 @@ class SettingDialog(QDialog, Ui_Dialog):
   def saveSettings(self):
     settings = QSettings()
     settings.setValue('a3_url', self.lineEdit.text())
+    QMessageBox.Information(self, 'Restart required', 'You need to restart QGIS for the changes to take effect')
     
   def loadSettings(self):
     settings = QSettings()
