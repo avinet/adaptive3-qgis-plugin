@@ -3,7 +3,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from qgis.core import *
-from PyQt4.QtCore import QSettings
+from PyQt4.QtCore import SIGNAL, QSettings, QUrl
+from PyQt4.QtNetwork import QNetworkAccessManager, QNetworkRequest
 import adaptive_data
 
 import json
@@ -20,7 +21,6 @@ if not settings.contains('a3_url'):
 
 # Configuration: adaptive 3 url
 host = settings.value('a3_url', type=str)
-
 
 def validateProject(iface, filePath):
     ''' Validates if the project file meets Adaptive's requirements
@@ -48,29 +48,37 @@ def authenticate(username, password):
         params: string username, string password
         returns: string token
     '''
+    global auth_reply
 
     params = { "email": username,
                "pass": hashlib.sha512(password).hexdigest() }
 
-    req = urllib2.Request('{}/WebServices/generic/Authentication.asmx/Authenticate'.format(host))
-    req.add_header('Content-Type', 'application/json')
+    mgr = QgsNetworkAccessManager.instance()
+    url = QUrl('{}/WebServices/generic/Authentication.asmx/Authenticate'.format(host))
 
-    try:
-        f = urllib2.urlopen(req, json.dumps(params))
-        result = json.loads(f.read())
-        result = result["d"]
+    print("Logging in to Adaptive", url)
+    request = QNetworkRequest(url)
+    request.setRawHeader('Content-Type', 'application/json')
+    auth_reply = mgr.post(request, json.dumps(params))
+    auth_reply.connect(auth_reply, SIGNAL("finished()"), authenticate_response)
 
-        if not result["success"]:
-            return ""
+def authenticate_response():
+    global auth_reply
 
-        for d in result["data"]:
-            if d["key"] == "gm_session_id":
-                return str(d["value"])
-            else:
-                return ""
-    except:
+    response = str(auth_reply.readAll())
+    print("Auth response", response)
+
+    result = json.loads(response)
+    result = result["d"]
+
+    if not result["success"]:
         return ""
 
+    for d in result["data"]:
+        if d["key"] == "gm_session_id":
+            return str(d["value"])
+        else:
+            return ""
 
 def uploadProjectFile(iface, filePath, projectName, uuid = None):
     ''' Uploads project file to the Adaptive service
