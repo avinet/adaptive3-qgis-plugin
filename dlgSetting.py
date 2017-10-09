@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
+from PyQt4.QtGui import QDialog
+from PyQt4.QtCore import QSettings
 from dlgSettingBase import Ui_Dialog
-
 
 class SettingDialog(QDialog, Ui_Dialog):
   def __init__(self, parent):
