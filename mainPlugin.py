@@ -62,14 +62,15 @@ class AdaptivePlugin():
     
     def _isAuthenticated(func):
         def func_wrapper(self):
-            if adaptive_data.token:
-                func(self)
-                return
-            else:
-                success = adaptiveUtils.authenticateUser(self, partial(func, self))  
-            if(success is False):
-                func(self, True)
-                return
+            def cb(success):
+                if success is True:
+                    func(self)
+                if success is False:
+                    success = self.authenticateUser(partial(func, self))
+                if(success is False):
+                    func(self, True)
+
+            adaptiveUtils.verifySession(cb)
 
         return func_wrapper
 
@@ -121,3 +122,18 @@ class AdaptivePlugin():
     def runSettings(self):
         dialog = SettingDialog(self.iface)
         dialog.exec_()
+
+    def authenticateUser(self, afterAuth):
+        dlg = EnterPasswordDialog(self.iface)
+        dlg.label_3.setText(QCoreApplication.translate('AdaptivePlugin', u"Please provide your Adaptive username and password"))
+        dlg.labelError.hide()
+        dlg.lineUser.setText(adaptive_data.token_username)
+        dlg.linePass.setText(adaptive_data.token_password)
+        if adaptive_data.token_username: dlg.linePass.setFocus()
+        dlg.exec_()
+        if dlg.result():
+            afterAuth()
+            return True
+        else:
+            QMessageBox.information(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u"Adaptive information"), QCoreApplication.translate('AdaptivePlugin', u"Authentication is required in order to use Adaptive plugin."))
+            return False

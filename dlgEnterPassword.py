@@ -6,13 +6,14 @@ from PyQt4.QtCore import SIGNAL, QSettings, QUrl
 from PyQt4.QtNetwork import QNetworkAccessManager, QNetworkRequest
 import json
 import hashlib
+import adaptive_data
 import adaptiveUtils
 from functools import partial
 
-import adaptive_data
 class EnterPasswordDialog(QDialog, Ui_EnterPasswordDialogBase):
-  def __init__(self, parent):
+  def __init__(self, iface):
     QDialog.__init__(self)
+    self.iface = iface
     self.setupUi(self)
     self.mgr = QgsNetworkAccessManager.instance()
     
@@ -31,22 +32,11 @@ class EnterPasswordDialog(QDialog, Ui_EnterPasswordDialogBase):
     reply = self.mgr.post(request, json.dumps(params))
     reply.connect(reply, SIGNAL("finished()"), partial(self.callback, reply))
 
+  @adaptiveUtils.validateServiceOutput("authenticate")
   def callback(self, response):
-    error = response.error()
-
-    if(error != 0):
-        return ""
-
-    response = adaptiveUtils.fixResponse(response)
-
-    if not response["success"]:
-        QMessageBox.information(self, QCoreApplication.translate('AdaptivePlugin', u"Adaptive information"), QCoreApplication.translate('AdaptivePlugin', u"Log in failed."))
-        return False
     for d in response["data"]:
         if d["key"] == "gm_session_id":
             adaptive_data.token = str(d["value"])
             self.done(1)
-            return True
         else:
             self.done(0)
-            return False

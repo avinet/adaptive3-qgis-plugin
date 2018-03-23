@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from qgis.core import *
+from PyQt4.QtGui import QDialog, QTreeWidgetItem, QMessageBox, QApplication
+from qgis.core import QgsNetworkAccessManager, QgsProject, QCoreApplication
 from PyQt4.QtCore import SIGNAL, QSettings, QUrl, QFile, QDir, QIODevice, QFileInfo
 from PyQt4.QtNetwork import QNetworkAccessManager, QNetworkRequest
 import json
@@ -10,8 +10,8 @@ from dlgProjectsBase import Ui_ProjectsDialog
 import adaptive_data
 import adaptiveUtils
 import time
+import utils
 
-host = "http://localhost/a_a3/"
 class ProjectsDialog(QDialog, Ui_ProjectsDialog):
     def __init__(self, iface):
         QDialog.__init__(self)
@@ -32,7 +32,7 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
             returns: bool AuthenticationOk, bool OperationOk, list of dicts: projects information (if ok) or error message (if not ok)
         '''
         
-        url = QUrl('{}/WebServices/administrator/modules/qgis/QgisProject.asmx/ReadExternal'.format(host))
+        url = QUrl('{}/WebServices/administrator/modules/qgis/QgisProject.asmx/ReadExternal'.format(adaptive_data.getHost()))
         params = {}
         request = QNetworkRequest(url)
         request.setRawHeader('Content-Type', 'application/json')
@@ -43,14 +43,8 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
         reply = self.mgr.post(request, json.dumps(params))
         reply.connect(reply, SIGNAL("finished()"),  partial(self.fillTree, reply))
 
+    @adaptiveUtils.validateServiceOutput("loading")
     def fillTree(self, response):
-        error = response.error()
-
-        if error != 0:
-            return "An error occured"
-
-        response = adaptiveUtils.fixResponse(response)
-
         self.treeProjects.clear()
         for project in response["records"]:
                 item = QTreeWidgetItem(self.treeProjects)
@@ -68,7 +62,7 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
             return
 
         fileUuid = self.treeProjects.selectedItems()[0].object["uuid"]
-        url = QUrl('{}/WebServices/administrator/modules/qgis/QgisProject.asmx/Destroy'.format(host))
+        url = QUrl('{}/WebServices/administrator/modules/qgis/QgisProject.asmx/Destroy'.format(adaptive_data.getHost()))
         params = {
             "uuids": [fileUuid], "extraParams": []
         }
@@ -81,27 +75,20 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
         reply = self.mgr.post(request, json.dumps(params))
         reply.connect(reply, SIGNAL("finished()"), partial(self.delete_project_callback, reply))
 
+    @adaptiveUtils.validateServiceOutput("loading")
     def delete_project_callback(self, response):
-        error = response.error()
-
-        if error != 0:
-            return "delete_project_callback - error != 0"
-
-        response = adaptiveUtils.fixResponse(response)
-
-        if not response["success"]:
-            print "delete_project_callback - success false"
-
         self.listProjectFiles()
 
     def loadProject(self):
         proj = QgsProject.instance()
         filePath = proj.fileName()
-        (operationOk, result) = utils.validateProject(self.iface, filePath)
+        print filePath
+        (operationOk, result) = utils.validateBeforeLoad(self.iface)
         if not operationOk:
             QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), result)
             return
         if not bool(self.treeProjects.selectedItems()):
+            print "not selected"
             return
         fileName = self.treeProjects.selectedItems()[0].object["filename"]
         fileUuid = self.treeProjects.selectedItems()[0].object["uuid"]
@@ -119,18 +106,16 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
             print "An error occured"
             return "An error occured"
 
-        response = str(response.readAll())
-        QFile.remove(QDir.tempPath()+'/' + filename)
-        tempFolder = int(time.time())
-        dir = QDir()
-        dir.mkpath('{}/{}'.format(QDir.tempPath(), tempFolder))
-        projectFile = QFile("{}/{}/{}".format(QDir.tempPath(), tempFolder, filename))
-        projectFile.open(QIODevice.ReadWrite | QIODevice.Truncate)
-        projectFile.write(response)
-        projectFile.flush()
-        projectFile.close()
         proj = QgsProject.instance()
         proj.clear()
+
+        response = str(response.readAll())
+        tempFolder = int(time.time())
+        fileDir = QDir()
+        fileDir.mkpath('{}/{}'.format(QDir.tempPath(), tempFolder))
+        projectFile = QFile("{}/{}/{}".format(QDir.tempPath(), tempFolder, filename))
+        projectFile.flush()
+        projectFile.close()
         proj.read(QFileInfo(projectFile.fileName()))
         QApplication.restoreOverrideCursor()
         self.close()

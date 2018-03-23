@@ -13,19 +13,6 @@ import urllib2, cookielib
 import hashlib
 import sys, traceback
 
-def postJson(url, params, callback, authHeaders = True):
-    mgr = QgsNetworkAccessManager.instance()
-    url = QUrl(url)
-    request = QNetworkRequest(url)
-    request.setRawHeader('Content-Type', 'application/json')
-
-    if authHeaders:
-        request.setRawHeader('gm_session_id', adaptive_data.token)
-        request.setRawHeader('gm_lang_code', 'nb')
-        
-    reply = mgr.post(request, json.dumps(params))
-    reply.finished.connect(lambda response: callback(response))
-
 def construct_multipart(files, data = {}):
     multiPart = QHttpMultiPart(QHttpMultiPart.FormDataType)
     for key, value in data.items():
@@ -67,4 +54,19 @@ def validateProject(iface, filePath):
     if proj.isDirty() or not filePath:
         return ( False, QCoreApplication.translate('publishing', u'You have unsaved changes. Please save before publishing.') )
 
+    return ( True, None )
+
+def validateBeforeLoad(iface):
+    proj = QgsProject.instance()
+    if proj.isDirty():
+        reply = QMessageBox.question(
+            iface.mainWindow(),
+            'Unsaved changes',
+            QCoreApplication.translate('publishing', u'You have unsaved changes. Please save before loading another project.'),
+            QMessageBox.Yes, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            proj.clear()
+            return ( True, None )
+        else:
+            return ( False, None )
     return ( True, None )

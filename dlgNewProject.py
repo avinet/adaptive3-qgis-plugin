@@ -11,8 +11,6 @@ import utils
 import json
 from functools import partial
 
-host = "http://localhost/a_a3/"
-
 class NewProjectDialog(QDialog, Ui_NewProjectDialogBase):
   def __init__(self, parent, filePath):
     QDialog.__init__(self)
@@ -30,7 +28,7 @@ class NewProjectDialog(QDialog, Ui_NewProjectDialogBase):
 
   def upload_project(self, files):
       multipart = utils.construct_multipart(files)
-      url = QUrl("{}WebServices/administrator/modules/qgis/Uploader.ashx".format(host))
+      url = QUrl("{}WebServices/administrator/modules/qgis/Uploader.ashx".format(adaptive_data.getHost()))
       request = QNetworkRequest(url)
       request.setRawHeader('gm_session_id', adaptive_data.token)
       request.setHeader(
@@ -41,22 +39,16 @@ class NewProjectDialog(QDialog, Ui_NewProjectDialogBase):
       multipart.setParent(reply)
       reply.connect(reply, SIGNAL("finished()"), partial(self.upload_project_callback, reply))
 
+  @adaptiveUtils.validateServiceOutput("uploadProject")
+  @adaptiveUtils.validateUploadServiceOutput
   def upload_project_callback(self, response):
-      error = response.error()
-
-      if error != 0:
-          print "An error occured {}".format(error)
-          #self.done(0)
-
-      response = str(response.readAll())
-      response = json.loads(response)
       self.create_project(
           response["originalFileNames"][0],
           response["fileNames"][0])
-      return True
+      return
 
   def create_project(self, filename, projectfile):
-      url = QUrl('{}/WebServices/administrator/modules/qgis/QgisProject.asmx/ExternalCreate'.format(host))
+      url = QUrl('{}/WebServices/administrator/modules/qgis/QgisProject.asmx/ExternalCreate'.format(adaptive_data.getHost()))
       params = {
           "name": self.project_name,
           "filename": filename,
@@ -71,15 +63,6 @@ class NewProjectDialog(QDialog, Ui_NewProjectDialogBase):
       reply = self.mgr.post(request, json.dumps(params))
       reply.connect(reply, SIGNAL("finished()"), partial(self.create_project_callback, reply))
 
+  @adaptiveUtils.validateServiceOutput("createProject")
   def create_project_callback(self, response):
-    error = response.error()
-
-    if error != 0:
-        return "delete_project_callback - error != 0"
-
-    response = adaptiveUtils.fixResponse(response)
-
-    if not response["success"]:
-        print "create_project_callback - success false"
-    else:
-        print "create_project_callback - success true"
+      self.done(1)
