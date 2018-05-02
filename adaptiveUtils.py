@@ -22,7 +22,7 @@ def validateServiceOutput(operation):
         def func_wrapper(self, response):
             error = response.error()
             if error != 0:
-                QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), "Fix me: Server error")
+                QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), "Server communication error")
                 return
             response = fixResponse(response)
             if(response['success'] != True):
@@ -38,7 +38,7 @@ def validateServiceOutput(operation):
 def validateUploadServiceOutput(func):
     def func_wrapper(self, response):
         if not len(response["originalFileNames"]) == 1 and len(response["fileNames"]) == 1:
-            QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), "Fix me: Upload error")
+            QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), "Server communication error")
         else:
             func(self, response)
     return func_wrapper

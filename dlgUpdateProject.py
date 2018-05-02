@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtGui import QDialog
+from PyQt4.QtGui import QDialog, QMessageBox
 from dlgUpdateProjectBase import Ui_UpdateProjectDialogBase
 from qgis.core import QgsNetworkAccessManager
 from PyQt4.QtCore import SIGNAL, QSettings, QUrl, QFile
@@ -93,4 +93,9 @@ class UpdateProjectDialog(QDialog, Ui_UpdateProjectDialogBase):
 
     @adaptiveUtils.validateServiceOutput("updateProject")
     def update_project_callback(self, response):
+        QMessageBox.information(
+            self,
+            "Project updated",
+            "Project updated successfully"
+        )
         self.done(1)

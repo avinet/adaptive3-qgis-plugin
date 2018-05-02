@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
 from qgis.core import *
 from PyQt4.QtCore import SIGNAL, QSettings, QUrl
 from PyQt4.QtNetwork import QNetworkAccessManager, QNetworkRequest, QHttpMultiPart, QHttpPart
 import adaptive_data
-
-
 import json
 import urllib2, cookielib
 import hashlib
@@ -62,9 +59,9 @@ def validateBeforeLoad(iface):
         reply = QMessageBox.question(
             iface.mainWindow(),
             'Unsaved changes',
-            QCoreApplication.translate('publishing', u'You have unsaved changes. Please save before loading another project.'),
-            QMessageBox.Yes, QMessageBox.No)
-        if reply == QMessageBox.Yes:
+            QCoreApplication.translate('publishing', u'Your current project contains unsaved changes. Press OK to continue without saving'),
+            QMessageBox.Ok, QMessageBox.Cancel)
+        if reply == QMessageBox.Ok:
             proj.clear()
             return ( True, None )
         else:

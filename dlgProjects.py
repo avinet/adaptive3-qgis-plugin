@@ -82,19 +82,16 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
     def loadProject(self):
         proj = QgsProject.instance()
         filePath = proj.fileName()
-        print filePath
         (operationOk, result) = utils.validateBeforeLoad(self.iface)
         if not operationOk:
-            QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), result)
             return
         if not bool(self.treeProjects.selectedItems()):
-            print "not selected"
+            QMessageBox.information(self.iface.mainWindow(), 'Information', 'No project selected')
             return
         fileName = self.treeProjects.selectedItems()[0].object["filename"]
         fileUuid = self.treeProjects.selectedItems()[0].object["uuid"]
 
-        url = QUrl("{}/WebServices/administrator/modules/qgis/Downloader.ashx?gm_session_id={}&uuid={}".format(host, adaptive_data.token, fileUuid))
-
+        url = QUrl("{}/WebServices/administrator/modules/qgis/Downloader.ashx?gm_session_id={}&uuid={}".format(adaptive_data.getHost(), adaptive_data.token, fileUuid))
         request = QNetworkRequest(url)
         reply = self.mgr.get(request)
         reply.connect(reply, SIGNAL("finished()"),  partial(self.load_project_callback, reply, fileName))
@@ -103,8 +100,7 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
         error = response.error()
 
         if error != 0:
-            print "An error occured"
-            return "An error occured"
+            QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), 'Could not load project')
 
         proj = QgsProject.instance()
         proj.clear()
@@ -114,8 +110,21 @@ class ProjectsDialog(QDialog, Ui_ProjectsDialog):
         fileDir = QDir()
         fileDir.mkpath('{}/{}'.format(QDir.tempPath(), tempFolder))
         projectFile = QFile("{}/{}/{}".format(QDir.tempPath(), tempFolder, filename))
-        projectFile.flush()
+        projectFile.open(QIODevice.ReadWrite | QIODevice.Truncate)
+        projectFile.write(response)
         projectFile.close()
-        proj.read(QFileInfo(projectFile.fileName()))
+
+        time.sleep(1)
+
+        proj.setFileName(projectFile.fileName())
+        proj.read()
+
+        cachingEnabled = self.iface.mapCanvas().isCachingEnabled()
+        for layer in self.iface.mapCanvas().layers():
+            if cachingEnabled:
+                layer.setCacheImage(None)
+            layer.triggerRepaint()
+
+        self.iface.mapCanvas().refresh()
         QApplication.restoreOverrideCursor()
         self.close()

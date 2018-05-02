@@ -65,4 +65,9 @@ class NewProjectDialog(QDialog, Ui_NewProjectDialogBase):
 
   @adaptiveUtils.validateServiceOutput("createProject")
   def create_project_callback(self, response):
+      QMessageBox.information(
+            self,
+            "Project created",
+            "Project created successfully"
+        )
       self.done(1)
