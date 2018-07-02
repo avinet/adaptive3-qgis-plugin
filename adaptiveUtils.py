@@ -28,7 +28,8 @@ def validateServiceOutput(operation):
             if(response['success'] != True):
                 errorMsg = 'Error'
                 if 'exception' in response:
-                    errorMsg = response['exception']['msg']
+                    if 'msg' in response['exception']:
+                        errorMsg = response['exception']['msg']
                 QMessageBox.critical(self.iface.mainWindow(), QCoreApplication.translate('AdaptivePlugin', u'Error!'), errorMsg)
             else:
                 func(self, response)
